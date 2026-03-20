@@ -182,6 +182,7 @@ The 0.70 factor prevents over-insurance moral hazard.
 ## Parametric Triggers
 
 Five triggers. All objective, all API-verifiable, all tied directly to income loss within a rider's 2km zone. Trigger fires → payout initiates. No claim filing.
+
 | # | Trigger | Exact Threshold | Income Loss Mechanism | Data Source |
 |---|---|---|---|---|
 | 1 | Hyperlocal Waterlogging | IMD Red Alert (≥64.5mm/day) AND ≥1 road within 2km of dark store flooded | Zone completion collapses; rider cannot operate | OpenWeatherMap + Google Maps |
@@ -340,3 +341,11 @@ Goal: Both dashboards complete, end-to-end connected, demo-ready.
 | Food delivery / e-commerce riders | Outside Q-Commerce persona scope |
 | Manual claim filing | Defeats parametric insurance design |
 | Continuous GPS tracking | Privacy concern — last-ping validation only |
+
+### Future Scope
+
+- Direct platform API integration replacing all mock endpoints
+- IRDAI regulatory compliance framework for commercial launch
+- Expansion to food delivery and e-commerce personas
+- Regional language support (Hindi, Tamil, Telugu) on rider PWA
+- Aadhaar-based income verification via DigiLocker API
