@@ -75,12 +75,12 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 ## Application Workflow
 
 ```mermaid
-%%{init: {'theme': 'default'}}%%
+%%{init: {'theme': 'default', 'themeVariables': {'background': '#ffffff'}}}%%
 flowchart TD
     A([Rider Opens PWA]) --> B[Onboarding]
     B --> C[AI Risk Profiling]
     C --> D[Weekly Policy Purchase]
-    D --> E[Trigger Engine — 24/7 Monitoring]
+    D --> E[Trigger Engine\n24/7 Monitoring]
     E --> F{Trigger Fires?}
     F -- No --> E
     F -- Yes --> G{Policy Active + Rider Online?}
