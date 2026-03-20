@@ -1,4 +1,4 @@
-# GigShield - Parametric Income Insurance for Q-Commerce Riders
+# GigShield — Parametric Income Insurance for Q-Commerce Riders
 
 > Automated weekly income protection for Zepto / Blinkit / Swiggy Instamart delivery partners. When a disruption is detected, the payout goes out automatically. No claim forms. No waiting.
 
@@ -73,53 +73,45 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 
 ## Application Workflow
 
-''' mermaid
+```mermaid
 flowchart LR
     A([Rider\nOpens PWA]) --> B[Onboarding\nOTP · Platform ID\nAadhaar eKYC\nDark store · UPI\nIncome tier]
     B --> C[AI Risk\nProfiling\nXGBoost 0–100\n~60 seconds]
     C --> D[Weekly Policy\nPurchase\nSelect plan\nPay via UPI]
     D --> E[Trigger Engine\nMonitoring 24/7\nWeather · AQI\nMock APIs]
-
     E --> F{Trigger\nFires?}
     F -- No --> E
     F -- Yes --> G{Policy active\n+ Rider online?}
     G -- No --> E
     G -- Yes --> H[Fraud Check\nGPS · Duplicate\nAnomaly]
-
     H --> I{CLEAR\nor FLAG?}
     I -- CLEAR --> J[Payout\nRazorpay sandbox\nUPI within 2 hrs]
     I -- FLAG --> K[Manual\nReview\n4 hr target]
     K --> J
-
     J --> L([Rider\nNotified])
     J --> M([Insurer\nDashboard\nUpdated])
-'''
+```
 
 ### Rider PWA (6 Steps)
 
 **Step 1 — Onboarding (one-time, ~3 min)**
-OTP login → select platform → platform ID upload → Aadhaar eKYC → 
-dark store pincode → UPI ID → income tier (Low/Mid/High).
+OTP login → select platform → platform ID upload → Aadhaar eKYC → dark store pincode → UPI ID → income tier (Low/Mid/High).
 
 **Step 2 — AI Risk Profiling (automatic, ~60 sec)**
-No rider action. Zone scored (0–100) from historical weather + AQI data.
-Rider sees: *"Zone risk: 74/100. Recommended: Suraksha Plus."*
+No rider action. Zone scored (0–100) from historical weather + AQI data. Rider sees: *"Zone risk: 74/100. 
+Recommended: Suraksha Plus."*
 
 **Step 3 — Weekly Policy Purchase**
-Select plan → pay via UPI → active Monday to Sunday → 
-auto-renewal prompt every Sunday.
+Select plan → pay via UPI → active Monday to Sunday → auto-renewal prompt every Sunday.
 
 **Step 4 — Trigger Monitoring (continuous, no rider action)**
-System polls weather, AQI, and platform APIs automatically.
-Trigger fires only if policy is active and rider was online.
+System polls weather, AQI, and platform APIs automatically. Trigger fires only if policy is active and rider was online.
 
 **Step 5 — Auto Claim + Fraud Check (<2 min)**
-3 checks run simultaneously: GPS validation, duplicate check, 
-anomaly detection. All pass → approved. Any flag → manual review.
+3 checks run simultaneously: GPS validation, duplicate check, anomaly detection. All pass → approved. Any flag → manual review.
 
 **Step 6 — Payout**
-Amount calculated → sent to UPI → push notification to rider.
-Target: within 2 hours of trigger.
+Amount calculated → sent to UPI → push notification to rider. Target: within 2 hours of trigger.
 
 ---
 
@@ -295,8 +287,7 @@ Three models. Each has one job, specific inputs, and a specific output.
 Goal: No code. Strategy locked, README written, repo live.
 
 - Finalise persona, triggers, and premium model
-- Design application workflow and diagrams
-- Write README.md and set up GitHub repo
+- Design application workflow
 
 ---
 
