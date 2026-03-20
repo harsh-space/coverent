@@ -1,4 +1,5 @@
-# GigShield — Parametric Income Insurance for Q-Commerce Riders
+# GigShield 
+## Parametric Income Insurance for Q-Commerce Riders
 
 > Automated weekly income protection for Zepto / Blinkit / Swiggy Instamart delivery partners. When a disruption is detected, the payout goes out automatically. No claim forms. No waiting.
 
@@ -74,22 +75,23 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 ## Application Workflow
 
 ```mermaid
-flowchart LR
-    A([Rider\nOpens PWA]) --> B[Onboarding\nOTP · Platform ID\nAadhaar eKYC\nDark store · UPI\nIncome tier]
-    B --> C[AI Risk\nProfiling\nXGBoost 0–100\n~60 seconds]
-    C --> D[Weekly Policy\nPurchase\nSelect plan\nPay via UPI]
-    D --> E[Trigger Engine\nMonitoring 24/7\nWeather · AQI\nMock APIs]
-    E --> F{Trigger\nFires?}
+%%{init: {'theme': 'default'}}%%
+flowchart TD
+    A([Rider Opens PWA]) --> B[Onboarding]
+    B --> C[AI Risk Profiling]
+    C --> D[Weekly Policy Purchase]
+    D --> E[Trigger Engine — 24/7 Monitoring]
+    E --> F{Trigger Fires?}
     F -- No --> E
-    F -- Yes --> G{Policy active\n+ Rider online?}
+    F -- Yes --> G{Policy Active + Rider Online?}
     G -- No --> E
-    G -- Yes --> H[Fraud Check\nGPS · Duplicate\nAnomaly]
-    H --> I{CLEAR\nor FLAG?}
-    I -- CLEAR --> J[Payout\nRazorpay sandbox\nUPI within 2 hrs]
-    I -- FLAG --> K[Manual\nReview\n4 hr target]
+    G -- Yes --> H[Fraud Check]
+    H --> I{Clear or Flag?}
+    I -- Clear --> J[Payout via UPI]
+    I -- Flag --> K[Manual Review]
     K --> J
-    J --> L([Rider\nNotified])
-    J --> M([Insurer\nDashboard\nUpdated])
+    J --> L([Rider Notified])
+    J --> M([Insurer Dashboard Updated])
 ```
 
 ### Rider PWA (6 Steps)
