@@ -74,25 +74,7 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 
 ## Application Workflow
 
-```mermaid
-%%{init: {'theme': 'default', 'themeVariables': {'background': '#ffffff'}}}%%
-flowchart TD
-    A([Rider Opens PWA]) --> B[Onboarding]
-    B --> C[AI Risk Profiling]
-    C --> D[Weekly Policy Purchase]
-    D --> E[Trigger Engine\n24/7 Monitoring]
-    E --> F{Trigger Fires?}
-    F -- No --> E
-    F -- Yes --> G{Policy Active + Rider Online?}
-    G -- No --> E
-    G -- Yes --> H[Fraud Check]
-    H --> I{Clear or Flag?}
-    I -- Clear --> J[Payout via UPI]
-    I -- Flag --> K[Manual Review]
-    K --> J
-    J --> L([Rider Notified])
-    J --> M([Insurer Dashboard Updated])
-```
+![Application Workflow](docs/appworkflow.png)
 
 ### Rider PWA (6 Steps)
 
