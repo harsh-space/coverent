@@ -75,7 +75,7 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 ## Application Workflow
 
 <p align="center">
-  <img src="docs/appworkflow.png" width="400" alt="Application Workflow"/>
+  <img src="docs/appworkflow.png" width="200" alt="Application Workflow"/>
 </p>
 
 ### Rider PWA (6 Steps)
