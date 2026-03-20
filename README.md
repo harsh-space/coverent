@@ -1,4 +1,4 @@
-# GigShield — Parametric Income Insurance for Q-Commerce Riders
+# GigShield - Parametric Income Insurance for Q-Commerce Riders
 
 > Automated weekly income protection for Zepto / Blinkit / Swiggy Instamart delivery partners. When a disruption is detected, the payout goes out automatically. No claim forms. No waiting.
 
@@ -76,23 +76,29 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 
 ### Rider PWA (6 Steps)
 
-**Step 1 — Onboarding (one-time, ~3 minutes)**
-Rider opens PWA link → OTP login → selects platform (Zepto/Blinkit/Instamart) → uploads platform ID for income verification → Aadhaar eKYC (OTP-based, no document upload) → registers dark store pincode → enters UPI ID → declares income tier (Low/Mid/High).
+**Step 1 — Onboarding (one-time, ~3 min)**
+OTP login → select platform → platform ID upload → Aadhaar eKYC → 
+dark store pincode → UPI ID → income tier (Low/Mid/High).
 
-**Step 2 — AI Risk Profiling (automatic, ~60 seconds)**
-No rider action. System pulls 3-year historical weather + AQI data for the rider's pincode, scores the zone (0–100), and outputs a personalised weekly premium. Rider sees: *"Your zone risk score: 74/100. Recommended plan: Suraksha Plus."*
+**Step 2 — AI Risk Profiling (automatic, ~60 sec)**
+No rider action. Zone scored (0–100) from historical weather + AQI data.
+Rider sees: *"Zone risk: 74/100. Recommended: Suraksha Plus."*
 
 **Step 3 — Weekly Policy Purchase**
-Rider selects plan → pays via UPI in one tap → policy activates Monday 00:00 to Sunday 23:59 → auto-renewal prompt every Sunday evening.
+Select plan → pay via UPI → active Monday to Sunday → 
+auto-renewal prompt every Sunday.
 
-**Step 4 — Parametric Trigger Monitoring (continuous, no rider action)**
-GigShield polls OpenWeatherMap every 15 minutes, AQICN every 30 minutes, and simulated platform/municipal APIs continuously. When a trigger condition is met, the engine verifies the rider's policy is active and that the rider was online during the event window.
+**Step 4 — Trigger Monitoring (continuous, no rider action)**
+System polls weather, AQI, and platform APIs automatically.
+Trigger fires only if policy is active and rider was online.
 
-**Step 5 — Automatic Claim + Fraud Check (automated, <2 minutes)**
-Trigger fires → fraud engine runs 3 checks simultaneously (GPS zone validation, duplicate claim check, anomaly pattern check). All pass → auto-approved. Any flag → queued for manual review (target: 4 hours).
+**Step 5 — Auto Claim + Fraud Check (<2 min)**
+3 checks run simultaneously: GPS validation, duplicate check, 
+anomaly detection. All pass → approved. Any flag → manual review.
 
 **Step 6 — Payout**
-Payout calculated → transferred to rider's UPI via Razorpay sandbox → push notification sent → payout logged on rider dashboard. Target: within 2 hours of trigger confirmation.
+Amount calculated → sent to UPI → push notification to rider.
+Target: within 2 hours of trigger.
 
 ---
 
@@ -150,23 +156,15 @@ Weekly Premium = Base Premium + AI Risk Loading
 | Rider's active shift window | Platform API (simulated) | Low |
 | Rider's prior claim count | Internal DB | Low |
 
-**Resulting premium range:**
-
-| Tier | Low-Risk Zone | High-Risk Zone |
-|---|---|---|
-| Low | ₹69/week | ₹119/week |
-| Mid | ₹119/week | ₹169/week |
-| High | ₹159/week | ₹209/week |
-
 *Example: Mid-tier rider in Rohini, Delhi pays ₹169/week. Same tier in Kharadi, Pune pays ₹119/week.*
 
 ### Coverage Plans
 
-| Plan | Max Covered Days/Week | Max Payout/Week | Best For |
+| Plan | Max Covered Days/Week | Max Payout/Week |
 |---|---|---|---|
-| Suraksha Lite | 1 day | ₹700 | Occasional disruptions |
-| Suraksha Plus | 2 days | ₹1,400 | Monsoon / AQI season |
-| Suraksha Max | 3 days | ₹2,100 | Peak risk months |
+| Suraksha Lite | 1 day | ₹700 |
+| Suraksha Plus | 2 days | ₹1,400 |
+| Suraksha Max | 3 days | ₹2,100 |
 
 ### Payout Formula
 
@@ -200,21 +198,6 @@ Five triggers. All objective, all API-verifiable, all tied directly to income lo
 | 3 | Severe AQI | CPCB AQI ≥301 ("Very Poor") in rider's pincode for ≥3 consecutive hours during active shift | Sustained outdoor exposure causes respiratory stress; riders lose 6–10 delivery cycles | AQICN API (free tier) |
 | 4 | Zone / Market Closure | Official municipal or police order closing dark store zone or primary delivery zone | Dark store shuts or riders cannot enter/exit zone; zero orders dispatched | Simulated municipal alert API |
 | 5 | Platform Outage | Order-assignment system down ≥45 consecutive minutes during 6–10 PM peak window | Rider is active but receives zero orders; peak window = ~40% of daily earnings | Simulated platform status API |
-
-**Design rationale:**
-- **Dual conditions (Triggers 1 & 2):** Prevents false positives — a citywide Red Alert doesn't mean every 2km zone is impassable. Dual conditions make each trigger hyperlocal and fraud-resistant.
-- **AQI ≥301:** CPCB's "Very Poor" band is where respiratory effects begin for prolonged outdoor workers. Waiting for ≥401 ("Severe") means riders lose 3–4 earning hours before protection activates.
-- **45-minute outage threshold:** Short blips (5–15 min) are routine with no income impact. 45 minutes during peak = 3–4 lost orders = ₹90–₹140 direct loss — the threshold where impact becomes material.
-
-### Payout Per Trigger (Mid-Tier, Suraksha Plus)
-
-| Trigger | Disrupted Days Counted | Estimated Payout |
-|---|---|---|
-| Waterlogging | 1.0 | ₹630 |
-| Extreme Heat | 0.5 | ₹315 |
-| Severe AQI | 0.5 | ₹315 |
-| Zone Closure | 1.0 | ₹630 |
-| Platform Outage | 0.4 | ₹252 |
 
 ---
 
@@ -273,58 +256,43 @@ Three models. Each has one job, specific inputs, and a specific output.
 
 **Total infrastructure cost: ₹0**
 
-### Key Libraries
+### Integrations
 
-| Library | Purpose |
-|---|---|
-| React Router | Navigation across PWA screens |
-| Recharts | Analytics charts on insurer dashboard |
-| Leaflet.js | Live trigger map with zone overlays |
-| Axios | Frontend → backend API calls |
-| Firebase Cloud Messaging | Push notifications to rider PWA |
-
-### External APIs
-
-| API | Purpose | Cost |
+| Tool | Purpose | Cost |
 |---|---|---|
-| OpenWeatherMap | Rainfall, temperature, weather alerts | Free (1,000 calls/day) |
+| OpenWeatherMap | Rainfall, temperature, weather alerts | Free |
 | AQICN | Real-time AQI by city/pincode | Free |
-| Google Maps / OpenStreetMap | 2km radius zone check, flood layer | Free tier / fully free |
+| Google Maps / OpenStreetMap | 2km radius zone check, flood layer | Free |
 | Razorpay | Payout sandbox | Free |
+| React Router | PWA screen navigation | — |
+| Recharts | Insurer dashboard analytics charts | — |
+| Leaflet.js | Live trigger map with zone overlays | — |
+| Axios | Frontend → backend API calls | — |
+| Firebase Cloud Messaging | Push notifications to rider PWA | — |
 
 **Simulated in-house (mock FastAPI endpoints):**
 - Platform order completion rate by zone
 - Platform outage status feed
 - Municipal zone closure alert feed
 
-### Firebase Collections
-
-| Collection | Stores |
-|---|---|
-| riders | Profile, income tier, dark store pincode, UPI ID |
-| policies | Plan type, premium paid, active week dates |
-| triggers | All fired events with timestamps + affected zone |
-| claims | Status, fraud check results, payout amount |
-| zones | Risk scores, historical disruption data |
-
 ---
 
 ## Development Plan
 
-**Team:** 5 members | **Bandwidth:** 1–2 hours/day | **Estimated total hours:** ~300
+<!-- **Team:** 5 members | **Bandwidth:** 1–2 hours/day | **Estimated total hours:** ~300 -->
 
 ### Phase 1 — Ideation & Foundation (Mar 4–20)
 Goal: No code. Strategy locked, README written, repo live.
 
-| Task | Owner |
-|---|---|
-| Finalise persona, triggers, premium model | All 5 |
-| Design application workflow + diagrams | All 5 |
-| Write README.md + set up GitHub repo | Person 5 + 3 |
-| Learn assigned framework basics | Each individually |
-| Record 2-min strategy video | Person 5 |
+| Task |
+|---|
+| Finalise persona, triggers, premium model |
+| Design application workflow + diagrams |
+| Write README.md + set up GitHub repo |
+| Learn assigned framework basics |
+| Record 2-min strategy video |
 
-**Submission: README.md + 2-min video → March 20 EOD**
+<!-- **Submission: README.md + 2-min video → March 20 EOD** -->
 
 ---
 
@@ -333,25 +301,25 @@ Goal: Working prototype — onboarding, policy, premium, claims.
 
 **Week 3 — Backend + Data Layer**
 
-| Task | Owner |
-|---|---|
-| FastAPI setup + Firebase Firestore (5 collections) + Auth | Person 3 |
-| Rider registration + onboarding API endpoints | Person 3 |
-| Synthetic training data generation (IMD/CPCB-based) | Person 4 |
-| XGBoost risk model — train + save .pkl + expose via API | Person 4 |
-| Policy creation + premium calculation endpoint | Person 3 + 4 |
+| Task |
+|---|
+| FastAPI setup + Firebase Firestore (5 collections) + Auth |
+| Rider registration + onboarding API endpoints |
+| Synthetic training data generation (IMD/CPCB-based) |
+| XGBoost risk model — train + save .pkl + expose via API |
+| Policy creation + premium calculation endpoint |
 
 **Week 4 — Frontend + Trigger Engine**
 
-| Task | Owner |
-|---|---|
-| React PWA — onboarding + policy purchase screens | Person 1 |
-| Parametric trigger engine (OpenWeatherMap + AQICN polling) | Person 4 |
-| Mock APIs (platform outage + zone closure) | Person 5 |
-| Isolation Forest fraud model — train + integrate | Person 4 |
-| Razorpay sandbox payout integration | Person 3 |
+| Task |
+|---|
+| React PWA — onboarding + policy purchase screens |
+| Parametric trigger engine (OpenWeatherMap + AQICN polling) |
+| Mock APIs (platform outage + zone closure) |
+| Isolation Forest fraud model — train + integrate |
+| Razorpay sandbox payout integration |
 
-**Submission: Working code + 2-min demo video → April 4 EOD**
+<!-- **Submission: Working code + 2-min demo video → April 4 EOD** -->
 
 ---
 
@@ -360,49 +328,24 @@ Goal: Both dashboards complete, end-to-end connected, demo-ready.
 
 **Week 5 — Insurer Dashboard + Advanced Fraud**
 
-| Task | Owner |
-|---|---|
-| Insurer dashboard — trigger map + claims queue + analytics | Person 2 |
-| GPS velocity anomaly check added to fraud engine | Person 4 |
-| LSTM forecaster — train + connect to insurer dashboard | Person 4 |
-| Rider dashboard — earnings protected + active policy view | Person 1 |
+| Task |
+|---|
+| Insurer dashboard — trigger map + claims queue + analytics |
+| GPS velocity anomaly check added to fraud engine |
+| LSTM forecaster — train + connect to insurer dashboard |
+| Rider dashboard — earnings protected + active policy view |
 
 **Week 6 — Integration + Final Polish**
 
-| Task | Owner |
-|---|---|
-| End-to-end flow test (trigger → fraud → payout) | Person 3 + 5 |
-| Simulated disruption demo (fake rainstorm trigger) | Person 5 |
-| Push notifications via Firebase Cloud Messaging | Person 1 |
-| Bug fixes + UI polish across both interfaces | All 5 |
-| 5-min final demo video + pitch deck PDF (8–10 slides) | Person 5 |
+| Task |
+|---|
+| End-to-end flow test (trigger → fraud → payout) |
+| Simulated disruption demo (fake rainstorm trigger) |
+| Push notifications via Firebase Cloud Messaging |
+| Bug fixes + UI polish across both interfaces |
+| 5-min final demo video + pitch deck PDF (8–10 slides) |
 
-**Submission: Full platform + 5-min video + pitch deck → April 17 EOD**
-
----
-
-### Risk Buffer
-
-| Risk | Mitigation |
-|---|---|
-| LSTM too complex to finish in time | Fall back to XGBoost regressor — same output, simpler build |
-| Razorpay integration delayed | Hardcoded mock payout response — acceptable for demo |
-| Team bandwidth drops during exams | Person 5 handles integration; models already trained by Week 4 |
-
-### What Gets Demoed vs Simulated
-
-| Component | Status |
-|---|---|
-| Rider onboarding + OTP | ✅ Fully working |
-| AI risk scoring + premium display | ✅ Fully working |
-| Weekly policy purchase | ✅ Fully working (Razorpay sandbox) |
-| Parametric trigger engine | ✅ Working (real APIs + mock APIs) |
-| Fraud detection | ✅ Working (Isolation Forest) |
-| Auto payout | ✅ Working (Razorpay sandbox) |
-| Insurer dashboard | ✅ Fully working |
-| LSTM forecast widget | ⚠️ Working on synthetic data |
-| Municipal closure alert | ⚠️ Simulated mock API |
-| Platform outage detection | ⚠️ Simulated mock API |
+<!-- **Submission: Full platform + 5-min video + pitch deck → April 17 EOD** -->
 
 ---
 
@@ -419,7 +362,7 @@ Goal: Both dashboards complete, end-to-end connected, demo-ready.
 | Rider GPS | Validation uses last recorded ping at time of trigger — not continuous tracking. Privacy by design. |
 | Payout timeline | "Within 2 hours" reflects sandbox behaviour. Real UPI production transfers: typically under 10 minutes. |
 
-### Out of Scope (By Design)
+### Out of Scope
 
 | Excluded | Reason |
 |---|---|
@@ -428,11 +371,3 @@ Goal: Both dashboards complete, end-to-end connected, demo-ready.
 | Food delivery / e-commerce riders | Outside Q-Commerce persona scope |
 | Manual claim filing | Defeats parametric insurance design |
 | Continuous GPS tracking | Privacy concern — last-ping validation only |
-
-### Future Scope
-
-- Direct platform API integration replacing all mock endpoints
-- IRDAI regulatory compliance framework for commercial launch
-- Expansion to food delivery and e-commerce personas
-- Regional language support (Hindi, Tamil, Telugu) on rider PWA
-- Aadhaar-based income verification via DigiLocker API
