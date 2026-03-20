@@ -233,6 +233,75 @@ Three models. Each has one job, specific inputs, and a specific output.
 
 ---
 
+## Adversarial Defense & Anti-Spoofing Strategy
+
+> **Context:** A coordinated ring of 500 riders using GPS spoofing
+> apps can fake their location into a Red Alert zone and trigger
+> mass auto-payouts. Simple GPS verification is insufficient.
+> GigShield defends at three layers.
+
+---
+
+### Layer 1 — Differentiating a Genuine Worker from a Spoofer
+
+A real stranded rider leaves a physical trail a spoofing app
+cannot replicate. Isolation Forest cross-checks 5 signals:
+
+| Signal | Genuine Worker | Spoofer |
+|---|---|---|
+| Location history | Gradual movement toward dark store, then stops | Teleports into zone at trigger time |
+| Accelerometer + battery | Shows bike motion, normal drain | Flat — stationary device |
+| Platform activity | Online and accepting orders before trigger | Login spike exactly at trigger, no prior activity |
+| Cell tower vs GPS | Tower pings match dark store vicinity | Tower pings contradict GPS coordinates |
+| Zone order history | 4-week delivery pattern in this zone | No prior history in this zone |
+
+**Flag condition:** Any 2 of 5 signals contradict GPS claim →
+held for review. All 5 consistent → auto-approved.
+
+---
+
+### Layer 2 — Catching a Coordinated Ring (Population-Level Checks)
+
+Individual checks catch solo spoofers. A ring of 500 needs
+zone-level detection:
+
+- **Claim velocity:** If claims in a zone spike >3 standard
+  deviations above historical baseline within 15 minutes →
+  entire zone's auto-approval paused.
+- **Payout-to-active ratio:** Claims exceeding 140% of riders
+  verified active in the 2 hours pre-trigger → excess flagged.
+  Real disruptions only affect riders who were working.
+- **Coordination fingerprint:** 10+ riders in the same zone
+  showing GPS jumps within a 60-second window → coordinated
+  spoofing escalated to insurer review.
+
+---
+
+### Layer 3 — Protecting Honest Workers from False Positives
+
+A rider with a genuine network drop should never lose their payout.
+
+- Flagged claims are **held, not rejected** — payout is reserved.
+- Rider notified immediately: *"Claim under review — resolved
+  within 4 hours. Payout protected if disruption is confirmed."*
+- A rider failing only the GPS check (network drop) but passing
+  the other 4 signals → **auto-approved.**
+- System tuned to **95% recall on genuine claims** — fewer than
+  5% of legitimate claims are incorrectly flagged.
+
+---
+
+### Defense Summary
+
+| Attack | Defense |
+|---|---|
+| Solo GPS spoof | 5-signal Isolation Forest check |
+| Ring of 500 claiming at once | Claim velocity + active-rider ratio |
+| Coordinated spoofing app | Cross-zone fingerprint detection |
+| Honest rider with network drop | 4-signal fallback + grace hold |
+
+---
+
 ## Tech Stack
 
 | Layer | Technology | Reason |
