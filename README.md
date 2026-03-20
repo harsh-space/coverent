@@ -344,8 +344,10 @@ Goal: Both dashboards complete, end-to-end connected, demo-ready.
 
 ### Future Scope
 
-- Direct platform API integration replacing all mock endpoints
-- IRDAI regulatory compliance framework for commercial launch
-- Expansion to food delivery and e-commerce personas
-- Regional language support (Hindi, Tamil, Telugu) on rider PWA
-- Aadhaar-based income verification via DigiLocker API
+| Area | Detail |
+|---|---|
+| Platform APIs | Direct integration replacing all mock endpoints |
+| Compliance | IRDAI regulatory framework for commercial launch |
+| Persona Expansion | Food delivery and e-commerce rider coverage |
+| Language Support | Hindi, Tamil, Telugu on rider PWA |
+| Income Verification | Aadhaar-based verification via DigiLocker API |
