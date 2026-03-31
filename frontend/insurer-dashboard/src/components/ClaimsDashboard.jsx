@@ -1,58 +1,86 @@
 import { useState } from "react";
-import { claims } from "../data/mockData";
+
+const INITIAL_CLAIMS = [
+  { id: "CLM-001", userId: "R-8821", userName: "Rahul Sharma", trigger: "Rainfall", zone: "Rohini (110085)", payout: 450, status: "Approved", timestamp: "2:45 PM" },
+  { id: "CLM-002", userId: "R-4412", userName: "Amit Verma", trigger: "AQI", zone: "Dwarka (110075)", payout: 600, status: "Flagged", timestamp: "1:20 PM" },
+  { id: "CLM-003", userId: "R-9903", userName: "Priya Das", trigger: "Heatwave", zone: "Noida (201301)", payout: 800, status: "Processing", timestamp: "12:15 PM" },
+  { id: "CLM-004", userId: "R-1123", userName: "Suresh P.", trigger: "Rainfall", zone: "Gurgaon (122001)", payout: 320, status: "Approved", timestamp: "11:50 AM" },
+  { id: "CLM-005", userId: "R-7756", userName: "Deepak K.", trigger: "AQI", zone: "Anand Vihar (110092)", payout: 500, status: "Approved", timestamp: "10:30 AM" },
+  { id: "CLM-006", userId: "R-3321", userName: "Neha Singh", trigger: "Heatwave", zone: "Lajpat Nagar (110024)", payout: 710, status: "Flagged", timestamp: "09:45 AM" },
+];
+
+const STATUS_COLORS = {
+  Approved: "text-status-green border-status-green bg-status-green/10",
+  Processing: "text-status-orange border-status-orange bg-status-orange/10",
+  Flagged: "text-status-red border-status-red bg-status-red/10",
+};
 
 export default function ClaimsDashboard() {
   const [search, setSearch] = useState("");
 
-  const filteredClaims = claims.filter(c =>
-    c.rider_id.toLowerCase().includes(search.toLowerCase())
+  const filteredClaims = INITIAL_CLAIMS.filter(
+    (c) =>
+      c.id.toLowerCase().includes(search.toLowerCase()) ||
+      c.userId.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search strictly by Rider ID (e.g., R-1234)..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full bg-white/70 border border-slate-200/60 rounded-xl px-4 py-3 mb-6 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-sm transition-all"
-      />
-      <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white/50">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-100/60 text-slate-600 font-medium border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-4 text-sm uppercase tracking-wider">Rider ID</th>
-              <th className="px-6 py-4 text-sm uppercase tracking-wider">Name</th>
-              <th className="px-6 py-4 text-sm uppercase tracking-wider">Trigger</th>
-              <th className="px-6 py-4 text-sm uppercase tracking-wider">Payout</th>
-              <th className="px-6 py-4 text-sm uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-sm uppercase tracking-wider">Time</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 bg-white/40">
-            {filteredClaims.map((c, i) => (
-              <tr key={i} className="hover:bg-white/80 transition-colors">
-                <td className="px-6 py-4 font-semibold text-amber-700">{c.rider_id}</td>
-                <td className="px-6 py-4 font-medium text-slate-800">{c.rider}</td>
-                <td className="px-6 py-4 text-slate-600">
-                  <span className="bg-slate-100 px-2.5 py-1 rounded-md capitalize text-sm">{c.trigger}</span>
-                </td>
-                <td className="px-6 py-4 font-semibold text-slate-700">₹{c.payout}</td>
-                <td className="px-6 py-4">
-                  <span className={"px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide " + (
-                    c.status === "approved" ? "bg-emerald-100 text-emerald-700" :
-                    c.status === "flagged" ? "bg-rose-100 text-rose-700" :
-                    c.status === "rejected" ? "bg-slate-200 text-slate-700" :
-                    "bg-amber-100 text-amber-700"
-                  )}>
-                    {c.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-slate-500">{c.time}</td>
+    <div className="flex flex-col gap-6 font-sans text-ui-black">
+      {/* Search Input styled as cleanly as PWA inputs */}
+      <div>
+        <label className="text-[11px] font-black text-ui-gray-dark mb-2 block tracking-widest uppercase">Protocol Search</label>
+        <div className="relative">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-ui-gray-dark/50" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by ID or Rider..."
+              className="clean-input !pl-12"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+        </div>
+      </div>
+
+      {/* Modern Clean Table Wrapper */}
+      <div className="bg-ui-white border border-ui-gray-light rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-ui-gray-light/30 border-b border-ui-gray-light">
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Protocol ID</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Entity</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Trigger</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-right">Settlement</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-center">Status</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-right">Detected</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-ui-gray-light/50">
+              {filteredClaims.map((claim) => (
+                <tr key={claim.id} className="hover:bg-ui-gray-light/10 transition-colors duration-200">
+                  <td className="px-6 py-4 text-sm font-black text-ui-black tracking-tight">{claim.id}</td>
+                  <td className="px-6 py-4 text-sm font-bold text-ui-gray-dark tracking-tight">{claim.userId}</td>
+                  <td className="px-6 py-4">
+                    <span className="text-[10px] font-black text-ui-gray-dark uppercase tracking-widest px-3 py-1.5 rounded-full bg-ui-gray-light/30 border border-ui-gray-light">
+                      {claim.trigger}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right font-black text-ui-black tabular-nums">₹{claim.payout}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-center">
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${STATUS_COLORS[claim.status]}`}>
+                        {claim.status}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-right text-[11px] font-bold text-ui-gray-dark tabular-nums tracking-wider">{claim.timestamp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

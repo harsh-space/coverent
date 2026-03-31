@@ -7,290 +7,107 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
   Area,
   AreaChart,
 } from "recharts";
 
-// Unique gradient colors for each trigger bar
+// Cleaner modern palette matching PWA
 const TRIGGER_COLORS = {
-  Rain: "#6366f1",
-  AQI: "#f59e0b",
-  Heat: "#ef4444",
-  Waterlogging: "#0ea5e9",
-  Closure: "#8b5cf6",
+  Rain: "#F7C600", // brand-yellow
+  AQI: "#FF8C00",  // status-orange
+  Heat: "#FF3B30", // status-red
+  Waterlogging: "#333333", // ui-gray-dark
+  Closure: "#000000",      // ui-black
 };
 
-const CustomBarTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(255,255,255,0.8)",
-        borderRadius: "14px",
-        padding: "12px 16px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-      }}
-    >
-      <p style={{ margin: 0, fontWeight: 700, color: "#1e293b", fontSize: 14 }}>
-        {label}
-      </p>
-      <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>
-        <span style={{ fontWeight: 600, color: payload[0].color }}>
-          {payload[0].value}
-        </span>{" "}
-        claims
-      </p>
+    <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4 shadow-xl">
+      <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">{label}</p>
+      <div className="flex items-center gap-2">
+        <span className="w-2.5 h-2.5 rounded-full" style={{ background: payload[0].fill || payload[0].color }} />
+        <span className="text-xl font-black text-ui-black tracking-tight">{payload[0].value}</span>
+        <span className="text-xs font-bold text-ui-gray-dark uppercase tracking-widest">Claims</span>
+      </div>
     </div>
-  );
-};
-
-const CustomLineTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div
-      style={{
-        background: "rgba(255,255,255,0.95)",
-        backdropFilter: "blur(12px)",
-        border: "1px solid rgba(255,255,255,0.8)",
-        borderRadius: "14px",
-        padding: "12px 16px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-      }}
-    >
-      <p style={{ margin: 0, fontWeight: 700, color: "#1e293b", fontSize: 14 }}>
-        {label}
-      </p>
-      <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>
-        <span style={{ fontWeight: 600, color: "#6366f1" }}>
-          {payload[0].value}
-        </span>{" "}
-        claims
-      </p>
-    </div>
-  );
-};
-
-// Custom bar shape with rounded tops
-const RoundedBar = (props) => {
-  const { x, y, width, height, fill } = props;
-  if (height <= 0) return null;
-  const radius = Math.min(8, width / 2);
-  return (
-    <g>
-      <defs>
-        <linearGradient id={`bar-${fill}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={fill} stopOpacity={1} />
-          <stop offset="100%" stopColor={fill} stopOpacity={0.7} />
-        </linearGradient>
-      </defs>
-      <path
-        d={`M${x},${y + height} 
-            L${x},${y + radius} 
-            Q${x},${y} ${x + radius},${y} 
-            L${x + width - radius},${y} 
-            Q${x + width},${y} ${x + width},${y + radius} 
-            L${x + width},${y + height} 
-            Z`}
-        fill={`url(#bar-${fill})`}
-      />
-    </g>
   );
 };
 
 export default function ChartSummary() {
-  // Add color to each trigger entry for the bar chart
   const coloredTriggerData = claimsByTrigger.map((item) => ({
     ...item,
-    fill: TRIGGER_COLORS[item.trigger] || "#94a3b8",
+    fill: TRIGGER_COLORS[item.trigger] || "#333333",
   }));
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 text-ui-black font-sans">
       {/* ── Claims by Trigger — Bar Chart ── */}
-      <div
-        className="rounded-2xl border border-white/60 p-6 flex flex-col"
-        style={{
-          background: "rgba(255,255,255,0.55)",
-          backdropFilter: "blur(16px)",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.04)",
-        }}
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md"
-            style={{ background: "linear-gradient(135deg, #f59e0b, #fbbf24)" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="12" width="4" height="9" rx="1"/>
-              <rect x="10" y="7" width="4" height="14" rx="1"/>
-              <rect x="17" y="3" width="4" height="18" rx="1"/>
-            </svg>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-slate-800 leading-tight">Claims by Trigger</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Parametric trigger performance</p>
-          </div>
+      <div className="bg-ui-white border border-ui-gray-light rounded-2xl p-8 shadow-sm hover:-translate-y-1 transition-transform">
+        <div className="flex flex-col mb-8">
+            <h3 className="text-2xl font-black text-ui-black tracking-tight mb-2">Impact Distribution</h3>
+            <p className="text-sm font-bold text-ui-gray-dark">Aggregate Volume By Parametric Trigger</p>
         </div>
 
-        <div className="flex-1 min-h-[280px]">
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart
-              data={coloredTriggerData}
-              margin={{ top: 8, right: 12, left: -8, bottom: 0 }}
-              barCategoryGap="28%"
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
-              <XAxis
-                dataKey="trigger"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#94a3b8", fontSize: 12, fontWeight: 600 }}
+        <div className="h-[320px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={coloredTriggerData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
+              <XAxis 
+                dataKey="trigger" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: "#333333", fontSize: 10, fontWeight: 900, textTransform: "uppercase" }} 
               />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#94a3b8", fontSize: 12 }}
-              />
-              <Tooltip content={<CustomBarTooltip />} cursor={{ fill: "rgba(0,0,0,0.03)", radius: 8 }} />
-              <Bar
-                dataKey="claims"
-                shape={<RoundedBar />}
-                animationDuration={1200}
-                animationEasing="ease-out"
-              >
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#333333", fontSize: 10, fontWeight: 700 }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "#F9FAFB", radius: 8 }} />
+              <Bar dataKey="claims" radius={[6, 6, 0, 0]} barSize={40}>
                 {coloredTriggerData.map((entry, index) => (
-                  <RoundedBar key={index} fill={entry.fill} />
+                  <Bar key={index} dataKey="claims" fill={entry.fill} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Trigger legend pills */}
-        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
-          {claimsByTrigger.map((item) => (
-            <span
-              key={item.trigger}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
-              style={{
-                background: `${TRIGGER_COLORS[item.trigger]}14`,
-                color: TRIGGER_COLORS[item.trigger],
-              }}
-            >
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ background: TRIGGER_COLORS[item.trigger] }}
-              />
-              {item.trigger}: {item.claims}
-            </span>
-          ))}
-        </div>
       </div>
 
-      {/* ── Daily Claims Trend — Area/Line Chart (30 days) ── */}
-      <div
-        className="rounded-2xl border border-white/60 p-6 flex flex-col"
-        style={{
-          background: "rgba(255,255,255,0.55)",
-          backdropFilter: "blur(16px)",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.04)",
-        }}
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md"
-            style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-slate-800 leading-tight">Daily Claims Trend</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Last 30 days</p>
-          </div>
+      {/* ── Daily Claims Trend — Area Chart ── */}
+      <div className="bg-ui-white border border-ui-gray-light rounded-2xl p-8 shadow-sm hover:-translate-y-1 transition-transform">
+        <div className="flex flex-col mb-8">
+            <h3 className="text-2xl font-black text-ui-black tracking-tight mb-2">Time Sequence Tracker</h3>
+            <p className="text-sm font-bold text-ui-gray-dark">30-Day Aggregation of Triggered Payouts</p>
         </div>
 
-        <div className="flex-1 min-h-[280px]">
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart
-              data={dailyClaimsTrend}
-              margin={{ top: 8, right: 12, left: -8, bottom: 0 }}
-            >
+        <div className="h-[320px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={dailyClaimsTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
-                <linearGradient id="claimsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0.02} />
+                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#F7C600" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#F7C600" stopOpacity={0.01} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" vertical={false} />
-              <XAxis
-                dataKey="date"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#94a3b8", fontSize: 11 }}
-                interval={4}
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
+              <XAxis 
+                dataKey="date" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: "#333333", fontSize: 10, fontWeight: 700 }} 
+                interval={5}
               />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: "#94a3b8", fontSize: 12 }}
-              />
-              <Tooltip content={<CustomLineTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="claims"
-                stroke="#6366f1"
-                strokeWidth={2.5}
-                fill="url(#claimsGradient)"
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: "#333333", fontSize: 10, fontWeight: 700 }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Area 
+                type="monotone" 
+                dataKey="claims" 
+                stroke="#F7C600" 
+                strokeWidth={4} 
+                fill="url(#areaGradient)" 
                 dot={false}
-                activeDot={{
-                  r: 5,
-                  fill: "#6366f1",
-                  stroke: "#fff",
-                  strokeWidth: 2,
-                }}
-                animationDuration={1500}
-                animationEasing="ease-out"
+                activeDot={{ r: 6, fill: "#F7C600", stroke: "#FFFFFF", strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Summary stats */}
-        <div className="flex gap-4 mt-4 pt-4 border-t border-slate-100">
-          {[
-            {
-              label: "Peak",
-              value: Math.max(...dailyClaimsTrend.map((d) => d.claims)),
-              color: "#ef4444",
-            },
-            {
-              label: "Average",
-              value: Math.round(
-                dailyClaimsTrend.reduce((s, d) => s + d.claims, 0) /
-                  dailyClaimsTrend.length
-              ),
-              color: "#6366f1",
-            },
-            {
-              label: "Total",
-              value: dailyClaimsTrend.reduce((s, d) => s + d.claims, 0),
-              color: "#10b981",
-            },
-          ].map((stat) => (
-            <div key={stat.label} className="flex-1 text-center">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                {stat.label}
-              </p>
-              <p
-                className="text-xl font-extrabold mt-0.5"
-                style={{ color: stat.color }}
-              >
-                {stat.value}
-              </p>
-            </div>
-          ))}
         </div>
       </div>
     </div>

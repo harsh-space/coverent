@@ -1,49 +1,119 @@
-import { triggers } from "../data/mockData";
+import { useState, useCallback } from "react";
+
+const INITIAL_TRIGGERS = [
+  { id: "TRG-001", trigger: "Rainfall", zone: "Rohini (110085)", value: "72 mm", threshold: "> 64.5 mm", status: "TRIGGERED", affected_riders: 23, time: "2:10 PM" },
+  { id: "TRG-002", trigger: "AQI", zone: "Dwarka (110075)", value: "410", threshold: "> 300", status: "TRIGGERED", affected_riders: 15, time: "6:40 PM" },
+  { id: "TRG-003", trigger: "Temperature", zone: "Noida (201301)", value: "42°C", threshold: "> 45°C", status: "MONITORING", affected_riders: 0, time: "1:00 PM" },
+  { id: "TRG-004", trigger: "Rainfall", zone: "Gurgaon (122001)", value: "81 mm", threshold: "> 64.5 mm", status: "TRIGGERED", affected_riders: 31, time: "3:25 PM" },
+];
+
+const SIM_ZONES = ["Connaught Place (110001)", "Hauz Khas (110016)", "Vasant Kunj (110070)", "Janakpuri (110058)"];
+
+const TRIGGER_BADGE = {
+  TRIGGERED: "bg-status-red/10 text-status-red border-status-red",
+  MONITORING: "bg-status-green/10 text-status-green border-status-green",
+};
 
 export default function TriggerLogPage() {
-  const unapproved = triggers.filter(t => !t.approved);
+  const [triggerRows, setTriggerRows] = useState(INITIAL_TRIGGERS);
+  const [simulating, setSimulating] = useState(false);
+
+  const handleSimulate = useCallback(() => {
+    setSimulating(true);
+    setTimeout(() => {
+      const zone = SIM_ZONES[Math.floor(Math.random() * SIM_ZONES.length)];
+      const rainfall = Math.floor(Math.random() * 40) + 60;
+      const riders = Math.floor(Math.random() * 30) + 5;
+      const hour = Math.floor(Math.random() * 12) + 1;
+      const min = Math.floor(Math.random() * 60);
+      const ampm = Math.random() > 0.5 ? "PM" : "AM";
+      const newTrigger = {
+        id: `TRG-${String(triggerRows.length + 1).padStart(3, "0")}`,
+        trigger: "Rainfall",
+        zone,
+        value: `${rainfall} mm`,
+        threshold: "> 64.5 mm",
+        status: rainfall > 64.5 ? "TRIGGERED" : "MONITORING",
+        affected_riders: rainfall > 64.5 ? riders : 0,
+        time: `${hour}:${String(min).padStart(2, "0")} ${ampm}`,
+      };
+      setTriggerRows((prev) => [newTrigger, ...prev]);
+      setSimulating(false);
+    }, 600);
+  }, [triggerRows.length]);
 
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl p-8 shadow-xl shadow-amber-900/5 h-full flex flex-col">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Trigger Log</h2>
-        <p className="text-slate-500 mt-1">Review unapproved and critical system triggers</p>
-      </div>
+    <div className="flex flex-col gap-8 pb-10 text-ui-black font-sans">
       
-      <div className="flex-1 overflow-auto">
-        <div className="space-y-3">
-          {unapproved.map((t, i) => (
-            <div key={i} className="flex items-center justify-between p-4 bg-white/60 hover:bg-white/90 border border-white/80 rounded-2xl shadow-sm transition-all">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 shrink-0">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-slate-800">{t.type}</h4>
-                  <p className="text-sm text-slate-500">{t.location} — {t.time}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                  {t.affected} Affected
-                </span>
-                <div className="mt-2 space-x-2">
-                  <button className="text-sm font-medium text-amber-600 hover:text-amber-700">Review</button>
-                  <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700">Approve</button>
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {unapproved.length === 0 && (
-            <div className="text-center py-12 text-slate-500">
-              No unapproved triggers found.
-            </div>
-          )}
+      {/* Refined Header - Exact PWA Font sizing and spacing */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
+        <div className="flex items-center gap-4">
+          <div className="text-brand-yellow w-12 h-12 flex items-center justify-center">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-4xl font-black tracking-tight mb-2">Active Triggers</h2>
+            <p className="text-sm font-bold text-ui-gray-dark">Live Environmental Tracking</p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleSimulate}
+          disabled={simulating}
+          className={`${simulating ? "opacity-50 grayscale cursor-not-allowed shadow-none" : ""} btn-primary shrink-0`}
+        >
+          {simulating ? "Simulating..." : (<>Fire Simulator <span className="ml-1">→</span></>)}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
+           <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Triggered Logs</p>
+           <p className="text-2xl font-black text-status-red tracking-tight">{triggerRows.filter(t => t.status === "TRIGGERED").length}</p>
+        </div>
+        <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
+           <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Monitoring Active</p>
+           <p className="text-2xl font-black text-status-green tracking-tight">{triggerRows.filter(t => t.status === "MONITORING").length}</p>
+        </div>
+        <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
+           <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Impacted Personnel</p>
+           <p className="text-2xl font-black text-ui-black tracking-tight">{triggerRows.reduce((a, b) => a + b.affected_riders, 0)}</p>
+        </div>
+      </div>
+
+      {/* Clean Modern Table - Solid White, Minimal Shadows */}
+      <div className="bg-ui-white border border-ui-gray-light rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-ui-gray-light/30 border-b border-ui-gray-light">
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Trigger Event</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Monitoring Zone</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-center">Reading</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-center">Riders</th>
+                <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-right">Time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-ui-gray-light/50">
+              {triggerRows.map((row) => (
+                <tr key={row.id} className="hover:bg-ui-gray-light/10 transition-colors duration-200">
+                  <td className="px-6 py-4 text-sm font-black text-ui-black tracking-tight">{row.trigger}</td>
+                  <td className="px-6 py-4 text-sm font-bold text-ui-gray-dark tracking-tight">{row.zone}</td>
+                  <td className="px-6 py-4 text-center font-bold text-ui-black text-sm">{row.value}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${TRIGGER_BADGE[row.status]}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center text-sm font-bold text-ui-gray-dark tracking-tight">{row.affected_riders || "--"}</td>
+                  <td className="px-6 py-4 text-right text-[11px] font-bold text-ui-gray-dark tabular-nums tracking-wider">{row.time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

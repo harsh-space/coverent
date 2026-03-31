@@ -3,46 +3,25 @@ import ChartSummary from "../components/ChartSummary";
 
 export default function AnalyticsPage() {
   return (
-    <div className="flex flex-col gap-6 pb-8">
-      {/* Page Header */}
-      <div
-        className="rounded-3xl border border-white/40 p-8 shrink-0"
-        style={{
-          background: "rgba(255,255,255,0.7)",
-          backdropFilter: "blur(20px)",
-          boxShadow: "0 8px 32px rgba(180,130,30,0.06)",
-        }}
-      >
-        <div className="flex items-center gap-3 mb-1">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg"
-            style={{
-              background: "linear-gradient(135deg, #f59e0b, #d97706)",
-              boxShadow: "0 4px 14px rgba(245,158,11,0.3)",
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
-              <path d="M22 12A10 10 0 0 0 12 2v10z"/>
-            </svg>
+    <div className="flex flex-col gap-10 font-sans text-ui-black pb-8 animate-fade-in custom-scrollbar overflow-y-auto w-full px-1">
+      
+      {/* Refined Header - Exact PWA Font sizing and spacing */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
+        <div className="flex items-center gap-4">
+          <div className="text-brand-yellow w-12 h-12 flex items-center justify-center">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+             </svg>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 tracking-tight leading-tight">
-              Analytics Overview
-            </h2>
-            <p className="text-sm text-slate-400 mt-0.5">
-              Key metrics, triggers &amp; trends at a glance
-            </p>
+            <h2 className="text-4xl font-black tracking-tight mb-2">Analytics Trace</h2>
+            <p className="text-sm font-bold text-ui-gray-dark">Live Settlement Distribution Ledger</p>
           </div>
-        </div>
-
-        {/* Metric Cards */}
-        <div className="mt-6">
-          <AnalyticsSummary />
         </div>
       </div>
 
-      {/* Charts Section */}
+      <AnalyticsSummary />
       <ChartSummary />
     </div>
   );
