@@ -9,9 +9,13 @@ export default function LoginPage() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    const formData = new FormData(e.target);
+    const enteredUsername = formData.get("username") || username || "Admin";
+    
     setIsLoading(true);
     setTimeout(() => {
-      console.log("Login attempt:", { username, password });
+      console.log("Login attempt:", { username: enteredUsername, password });
+      localStorage.setItem("adminName", enteredUsername);
       navigate("/claims");
     }, 800);
   };
@@ -50,6 +54,7 @@ export default function LoginPage() {
               </svg>
               <input
                 type="text"
+                name="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 style={styles.input}
@@ -76,6 +81,7 @@ export default function LoginPage() {
               </svg>
               <input
                 type="password"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={styles.input}
@@ -234,9 +240,9 @@ const styles = {
   },
   brandSub: {
     fontSize: "14px",
-    color: "#94a3b8",
+    color: "#475569",
     margin: 0,
-    fontWeight: 400,
+    fontWeight: 600,
     letterSpacing: "0.5px",
     textTransform: "uppercase",
   },

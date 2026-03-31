@@ -1,7 +1,9 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 export default function Layout() {
+  const location = useLocation();
+  const adminName = localStorage.getItem("adminName") || "Admin";
   return (
     <div style={styles.wrapper}>
       {/* Animated background blobs from login page */}
@@ -11,29 +13,31 @@ export default function Layout() {
 
       <div className="flex h-screen w-full relative z-10 overflow-hidden font-sans">
         <Sidebar />
-        
+
         <div className="flex-1 flex flex-col overflow-hidden relative">
           {/* Top Header */}
           <header className="bg-white/70 backdrop-blur-xl border-b border-white/40 h-20 flex items-center justify-between px-8 shrink-0 shadow-sm z-20">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent tracking-tight">
+            <h1 className="text-4xl font-bold text-slate-800 tracking-tight">
               Insurer Dashboard
             </h1>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 bg-white/60 border border-white/80 px-4 py-2 rounded-2xl shadow-sm">
                 <div className="flex flex-col items-end">
-                  <span className="text-sm font-bold text-slate-800 leading-tight">Alex Carter</span>
+                  <span className="text-sm font-bold text-slate-800 leading-tight">
+                    {adminName}
+                  </span>
                   <span className="text-xs font-medium text-amber-600 leading-tight">Admin</span>
                 </div>
                 <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-md shadow-amber-500/20">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
                   </svg>
                 </div>
               </div>
             </div>
           </header>
-          
+
           {/* Main Content Area */}
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 relative z-10">
             <div className="max-w-7xl mx-auto min-h-full pb-12">
