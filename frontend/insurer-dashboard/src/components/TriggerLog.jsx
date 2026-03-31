@@ -1,13 +1,14 @@
 import { triggers } from "../data/mockData";
 
 export default function TriggerLog() {
+  const unapproved = triggers.filter(t => !t.approved);
+
   return (
     <div className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-bold mb-4">Trigger Log</h2>
       <ul>
-        {triggers.map((t, i) => (
+        {unapproved.map((t, i) => (
           <li key={i} className="border-b py-2">
-            <strong>{t.type}</strong> at {t.location} — {t.time}  
+            <strong>{t.type}</strong> at {t.location} — {t.time}
             <span className="text-gray-600"> (Affected Riders: {t.affected})</span>
           </li>
         ))}
