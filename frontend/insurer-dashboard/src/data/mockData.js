@@ -6,7 +6,7 @@ const getRandomDate = () => {
   return date.toISOString().replace('T', ' ').substring(0, 16);
 };
 
-const triggerTypes = ["waterlogging", "heat", "AQI", "closure", "outage"];
+const triggerTypes = ["rain", "heat", "AQI", "waterlogging", "closure"];
 const locations = ["Delhi", "Mumbai", "Bangalore", "Chennai", "Hyderabad", "Pune"];
 const names = ["John Doe", "Jane Smith", "Amit Kumar", "Priya Sharma", "Rahul Singh", "Sneha Patel", "Vikram Das"];
 const statuses = ["approved", "flagged", "pending", "rejected"];
@@ -26,6 +26,7 @@ export const analytics = {
   totalClaimsToday: 42,
   totalPayoutToday: 15400,
   activePolicies: 1250,
+  avgPremium: 349,
 };
 
 export const triggers = Array.from({ length: 50 }, (_, i) => ({
@@ -37,3 +38,33 @@ export const triggers = Array.from({ length: 50 }, (_, i) => ({
   approved: Math.random() > 0.4, // 60% are unapproved
 }));
 
+// --- Claims by Trigger (for bar chart) ---
+export const claimsByTrigger = [
+  { trigger: "Rain", claims: 128 },
+  { trigger: "AQI", claims: 87 },
+  { trigger: "Heat", claims: 64 },
+  { trigger: "Waterlogging", claims: 43 },
+  { trigger: "Closure", claims: 21 },
+];
+
+// --- Daily Claims Trend (30 days, for line chart) ---
+const generateDailyTrend = () => {
+  const data = [];
+  const today = new Date(2026, 2, 31);
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const month = d.toLocaleString("default", { month: "short" });
+    const day = d.getDate();
+    // Realistic-ish wave pattern with some randomness
+    const base = 18 + Math.sin(i * 0.45) * 8;
+    const noise = Math.floor(Math.random() * 7) - 3;
+    data.push({
+      date: `${month} ${day}`,
+      claims: Math.max(2, Math.round(base + noise)),
+    });
+  }
+  return data;
+};
+
+export const dailyClaimsTrend = generateDailyTrend();
