@@ -10,8 +10,8 @@ export default defineConfig({
     VitePWA({ 
       registerType: 'autoUpdate',
       manifest: {
-        name: 'GigShield Rider',
-        short_name: 'GigShield',
+        name: 'Coverent Rider',
+        short_name: 'Coverent',
         description: 'Automated parametric income insurance for Q-Commerce riders.',
         theme_color: '#0F172A',
         background_color: '#0F172A',

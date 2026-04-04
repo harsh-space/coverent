@@ -33,6 +33,15 @@ export default function Sidebar() {
           <polyline points="13 2 13 9 20 9"/>
         </svg>
       )
+    },
+    {
+      to: "/mock-triggers",
+      label: "Mock Triggers",
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+        </svg>
+      )
     }
   ];
 
@@ -45,7 +54,7 @@ export default function Sidebar() {
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
           </div>
-          <span className="text-3xl font-black tracking-tight">GigShield</span>
+          <span className="text-3xl font-black tracking-tight">Coverent</span>
         </div>
       </div>
       

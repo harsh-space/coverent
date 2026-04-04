@@ -1,27 +1,20 @@
 import { useState } from "react";
-
-const INITIAL_CLAIMS = [
-  { id: "CLM-001", userId: "R-8821", userName: "Rahul Sharma", trigger: "Rainfall", zone: "Rohini (110085)", payout: 450, status: "Approved", timestamp: "2:45 PM" },
-  { id: "CLM-002", userId: "R-4412", userName: "Amit Verma", trigger: "AQI", zone: "Dwarka (110075)", payout: 600, status: "Flagged", timestamp: "1:20 PM" },
-  { id: "CLM-003", userId: "R-9903", userName: "Priya Das", trigger: "Heatwave", zone: "Noida (201301)", payout: 800, status: "Processing", timestamp: "12:15 PM" },
-  { id: "CLM-004", userId: "R-1123", userName: "Suresh P.", trigger: "Rainfall", zone: "Gurgaon (122001)", payout: 320, status: "Approved", timestamp: "11:50 AM" },
-  { id: "CLM-005", userId: "R-7756", userName: "Deepak K.", trigger: "AQI", zone: "Anand Vihar (110092)", payout: 500, status: "Approved", timestamp: "10:30 AM" },
-  { id: "CLM-006", userId: "R-3321", userName: "Neha Singh", trigger: "Heatwave", zone: "Lajpat Nagar (110024)", payout: 710, status: "Flagged", timestamp: "09:45 AM" },
-];
+import { useDashboard } from "../context/DashboardContext";
 
 const STATUS_COLORS = {
-  Approved: "text-status-green border-status-green bg-status-green/10",
-  Processing: "text-status-orange border-status-orange bg-status-orange/10",
-  Flagged: "text-status-red border-status-red bg-status-red/10",
+  APPROVED: "text-status-green border-status-green bg-status-green/10",
+  PROCESSING: "text-status-orange border-status-orange bg-status-orange/10",
+  FLAGGED: "text-status-red border-status-red bg-status-red/10",
 };
 
 export default function ClaimsDashboard() {
   const [search, setSearch] = useState("");
+  const { claims } = useDashboard();
 
-  const filteredClaims = INITIAL_CLAIMS.filter(
+  const filteredClaims = claims.filter(
     (c) =>
       c.id.toLowerCase().includes(search.toLowerCase()) ||
-      c.userId.toLowerCase().includes(search.toLowerCase())
+      c.entity.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -61,13 +54,13 @@ export default function ClaimsDashboard() {
               {filteredClaims.map((claim) => (
                 <tr key={claim.id} className="hover:bg-ui-gray-light/10 transition-colors duration-200">
                   <td className="px-6 py-4 text-sm font-black text-ui-black tracking-tight">{claim.id}</td>
-                  <td className="px-6 py-4 text-sm font-bold text-ui-gray-dark tracking-tight">{claim.userId}</td>
+                  <td className="px-6 py-4 text-sm font-bold text-ui-gray-dark tracking-tight">{claim.entity}</td>
                   <td className="px-6 py-4">
                     <span className="text-[10px] font-black text-ui-gray-dark uppercase tracking-widest px-3 py-1.5 rounded-full bg-ui-gray-light/30 border border-ui-gray-light">
                       {claim.trigger}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right font-black text-ui-black tabular-nums">₹{claim.payout}</td>
+                  <td className="px-6 py-4 text-right font-black text-ui-black tabular-nums">₹{claim.settlement}</td>
                   <td className="px-6 py-4">
                     <div className="flex justify-center">
                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${STATUS_COLORS[claim.status]}`}>
@@ -75,7 +68,7 @@ export default function ClaimsDashboard() {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-right text-[11px] font-bold text-ui-gray-dark tabular-nums tracking-wider">{claim.timestamp}</td>
+                  <td className="px-6 py-4 text-right text-[11px] font-bold text-ui-gray-dark tabular-nums tracking-wider">{claim.time}</td>
                 </tr>
               ))}
             </tbody>
