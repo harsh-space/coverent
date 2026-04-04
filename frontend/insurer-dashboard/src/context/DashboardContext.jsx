@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 
 const DashboardContext = createContext();
 
-const API_BASE = "http://localhost:8000/api/triggers";
+const API_BASE = (import.meta.env.VITE_API_URL || "https://coverent-api.onrender.com").replace(/\/$/, "") + "/api/triggers";
 
 export function DashboardProvider({ children }) {
   const [triggers, setTriggers] = useState([]);
