@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/loginPage";
 import ClaimsPage from "./pages/ClaimsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import TriggerLogPage from "./pages/TriggerLogPage";
@@ -13,7 +13,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          
+
           {/* Authenticated Routes wrapped in Layout */}
           <Route element={<Layout />}>
             <Route path="/claims" element={<ClaimsPage />} />
