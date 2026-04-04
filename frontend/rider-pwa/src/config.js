@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_BASE_URL: import.meta.env.VITE_API_URL || '/api',
+  API_BASE_URL: (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') || '/api',
   PLATFORMS: [
     { id: 'blinkit', name: 'Blinkit' },
     { id: 'zepto', name: 'Zepto' },
