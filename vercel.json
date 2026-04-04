@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/app/main.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxDuration": 10
+      }
+    },
+    {
+      "src": "frontend/rider-pwa/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/rider-pwa/dist/$1",
+      "check": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/rider-pwa/dist/index.html"
+    }
+  ]
+}
