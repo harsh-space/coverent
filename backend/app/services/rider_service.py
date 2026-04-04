@@ -115,6 +115,9 @@ async def get_rider_profile(rider_id: str):
         p_doc = db.collection("platform_data").document(platform_id).get()
         if p_doc.exists:
             active_days = p_doc.to_dict().get("active_days", 0)
+            # Sync back to rider collection if it changed
+            if active_days != rider_dict.get("active_days_count"):
+                rider_ref.update({"active_days_count": active_days})
             
     rider_dict["rider_id"] = rider_doc.id
     rider_dict["active_days_count"] = active_days

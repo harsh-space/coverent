@@ -14,6 +14,16 @@ export default function Dashboard() {
   const [isOffline, setIsOffline] = useState(false);
   const [expandedClaim, setExpandedClaim] = useState(null);
 
+  // Auto-dismiss the claim notification after 8 seconds
+  useEffect(() => {
+    if (newClaimNotify) {
+      const timer = setTimeout(() => {
+        setNewClaimNotify(null);
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [newClaimNotify]);
+
   // Refs for background interval stability
   const payoutCountRef = useRef(-1);
   const riderIdRef = useRef(localStorage.getItem('rider_id'));
@@ -62,8 +72,9 @@ export default function Dashboard() {
             payoutCountRef.current = currentCount;
             setProfile(data); // Initial sync
           } else if (currentCount > payoutCountRef.current) {
+            // New claim detected!
             setNewClaimNotify(history[0]);
-            setProfile({ ...data }); // Force new object reference
+            setProfile(data); 
             payoutCountRef.current = currentCount;
           }
         } else {
@@ -109,8 +120,8 @@ export default function Dashboard() {
     coverage: profile?.policy_type === 'suraksha_basic' ? 420 : profile?.policy_type === 'suraksha_plus' ? 630 : 805,
   };
 
-  // Direct mapping to ensure no data loss between renders
-  const claims = Array.isArray(profile?.payout_history) ? profile.payout_history : [];
+  // Direct mapping to ensure no data loss between renders, limited to latest 5
+  const claims = Array.isArray(profile?.payout_history) ? profile.payout_history.slice(0, 5) : [];
 
   if (loading) {
     return (
@@ -166,22 +177,30 @@ export default function Dashboard() {
       </div>
 
       {newClaimNotify && (
-        <div className="fixed inset-x-4 top-6 z-[100] animate-bounce-in">
-          <div className="bg-status-green p-4 rounded-2xl shadow-xl border-2 border-ui-white flex items-center gap-4">
-            <div className="p-2 bg-ui-white/20 rounded-full">
-              <CheckCircle2 className="text-ui-white w-6 h-6" strokeWidth={3} />
+        <div 
+          className="fixed inset-x-4 top-8 z-[200] animate-bounce-in cursor-pointer"
+          onClick={() => setNewClaimNotify(null)}
+        >
+          <div className="bg-status-green p-5 rounded-3xl shadow-[0_20px_50px_rgba(40,199,111,0.3)] border-2 border-ui-white/20 flex items-center gap-4 relative overflow-hidden backdrop-blur-md">
+            {/* Animated progress bar for auto-dismiss */}
+            <div className="absolute bottom-0 left-0 h-1 bg-white/30 animate-shrink-width" style={{ width: '100%' }}></div>
+            
+            <div className="p-3 bg-ui-white/20 rounded-2xl">
+              <CheckCircle2 className="text-ui-white w-7 h-7" strokeWidth={3} />
             </div>
             <div className="flex-1">
-              <p className="text-ui-white text-xs font-black uppercase tracking-wider opacity-90">Instant Payout Settled</p>
-              <p className="text-ui-white text-lg font-black leading-tight">₹{newClaimNotify.amount} credited to UPI</p>
-              <p className="text-ui-white/80 text-[10px] font-bold">Reason: {newClaimNotify.trigger_type.replace('_', ' ')} detected</p>
+              <p className="text-ui-white text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-0.5">Instant Payout Settled</p>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-ui-white text-2xl font-black tracking-tight">₹{newClaimNotify.amount}</span>
+                <span className="text-ui-white/80 text-[10px] font-bold uppercase tracking-tight">to UPI</span>
+              </div>
+              <p className="text-ui-white/90 text-xs font-bold mt-1 decoration-ui-white/30 truncate max-w-[200px]">
+                Reason: {newClaimNotify.trigger_type.replace('_', ' ').toUpperCase()}
+              </p>
             </div>
-            <button
-              onClick={() => setNewClaimNotify(null)}
-              className="text-ui-white/60 hover:text-ui-white p-1"
-            >
-              <AlertCircle className="rotate-45 w-5 h-5" />
-            </button>
+            <div className="p-2 hover:bg-ui-white/10 rounded-full transition-colors shrink-0">
+               <Radio className="text-ui-white/40 w-5 h-5 animate-pulse" strokeWidth={3} />
+            </div>
           </div>
         </div>
       )}
@@ -317,12 +336,19 @@ export default function Dashboard() {
                 setLoading(true);
                 try {
                   const rider_id = localStorage.getItem('rider_id');
-                  const res = await fetch(`http://127.0.0.1:8000/api/riders/profile/${rider_id}`);
+                  const res = await fetch(`${CONFIG.API_BASE_URL}/riders/profile/${rider_id}`);
                   if (res.ok) {
                     const data = await res.json();
+                    const history = data.payout_history || [];
+                    if (payoutCountRef.current !== -1 && history.length > payoutCountRef.current) {
+                       setNewClaimNotify(history[0]);
+                    }
                     setProfile(data);
-                    payoutCountRef.current = (data.payout_history || []).length;
+                    payoutCountRef.current = history.length;
+                    addToast('Claims Synced', 'success');
                   }
+                } catch (err) {
+                  addToast('Manual sync failed', 'error');
                 } finally {
                   setLoading(false);
                 }

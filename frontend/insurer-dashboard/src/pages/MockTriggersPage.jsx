@@ -147,15 +147,21 @@ export default function MockTriggersPage() {
           return 14;
         }
         
-        if (Math.random() > 0.4) {
-           const trigger = TRIGGERS[0];
-           const zone = ZONES[Math.floor(Math.random() * ZONES.length)];
+        // Randomly pick 1-2 trigger events per "day" to make it feel busy
+        const fireCount = Math.random() > 0.6 ? 2 : 1;
+        
+        for (let i = 0; i < fireCount; i++) {
+           const type = TRIGGERS[Math.floor(Math.random() * TRIGGERS.length)];
+           // Increased probability for demo zone 110001
+           const demoZone = ZONES.find(z => z.pin === "110001") || ZONES[0];
+           const zone = Math.random() > 0.4 ? demoZone : ZONES[Math.floor(Math.random() * ZONES.length)];
+           
            fireTrigger({
-             type: trigger,
+             type,
              zone: `${zone.name} (${zone.pin})`,
-             value: `${Math.floor(Math.random() * 30) + 60} mm`,
-             threshold: "> 64.5 mm",
-             affectedRiders: Math.floor(Math.random() * 15) + 5
+             value: `${Math.floor(Math.random() * 30) + 60}${type === "AQI" ? "" : " mm"}`,
+             threshold: "DYNAMIC",
+             affectedRiders: Math.floor(Math.random() * 25) + 5
            });
         }
 

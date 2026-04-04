@@ -8,3 +8,5 @@ scikit-learn
 pandas
 xgboost
 joblib
+numpy
+requests

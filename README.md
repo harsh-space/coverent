@@ -103,12 +103,13 @@ Amount calculated → sent to UPI → push notification to rider. Target: within
 
 ### Insurer Web Dashboard
 
-| View | What It Shows |
-|---|---|
-| Live Trigger Map | Active events by type (waterlogging/heat/AQI/closure/outage) with zone overlays. Affected riders per zone. |
-| Claims Queue | Auto-approved claims (last 24 hrs) + flagged claims with fraud check detail and rider GPS trail. |
-| Analytics | Loss ratio, zone-wise claim heatmap, 7-day payout forecast, renewal rate. |
-| Policy Management | Active policies, tier distribution, zone risk override, CSV export. |
+| View | What It Shows | Status |
+|---|---|---|
+| Live Trigger Map | Active events (Rain/Heat/AQI) with zone overlays. | **Implemented** |
+| Claims/Payouts Queue | Audit log of all auto-approved payouts with fraud details. | **Implemented** |
+| Analytics Dashboard | Loss ratio, zone-wise claims, and fund disbursement. | **Implemented** |
+| Mock Trigger Dispatch | Manual simulation for demo triggers and stress tests. | **Implemented** |
+| Policy Management | Active policies, tier distribution, and pool limits. | **Implemented** |
 
 ---
 
@@ -205,42 +206,34 @@ Five triggers. All objective, all API-verifiable, all tied directly to income lo
 
 ## AI/ML Integration Plan
 
-Three models. Each has one job, specific inputs, and a specific output.
-
 ### Model 1 — Zone Risk Scoring Engine
 
 **Job:** Score a rider's zone at onboarding → determine AI risk loading on weekly premium.
-**Algorithm:** XGBoost Regressor — best-performing model for tabular insurance risk data with mixed feature types.
-**Inputs (6):** 3-year waterlogging frequency, seasonal AQI score, city tier, zone composite risk score, shift window, prior claim count.
-**Output:** Risk score (0–100) → premium adjustment (-₹20 to +₹30). Runs at onboarding, refreshed every 4 weeks.
+**Algorithm:** XGBoost Regressor trained on **1,500+ samples** derived from **3-year historical IMD and CPCB records**.
+**Inputs (6):** `zone_flood_score`, `zone_aqi_score`, `shift_pattern_score`, `city_tier`, `historical_claim_rate`, `zone_composite_score`.
+**Output:** Risk score (0–100) → premium adjustment (-₹20 to +₹30).
 
 #### XGBoost Model Architecture & Approach
 
 **1. Model Objective & Hyperparameters**
-The engine uses an `XGBRegressor` with a `reg:squarederror` objective to predict a continuous risk score. To ensure a balance between accuracy and computational efficiency for mobile onboarding, we use:
-- **n_estimators:** 100
-- **max_depth:** 5
-- **learning_rate:** 0.1
-- **Random State:** 42 (for reproducible risk scoring)
+The engine uses an `XGBRegressor` with a `reg:squarederror` objective to predict a continuous risk score.
+- **n_estimators:** 100 | **max_depth:** 5 | **learning_rate:** 0.1 | **Target**: Disruption probability.
 
 **2. Feature Engineering Logic**
-| Feature | Weight (Approx) | Rationale |
-|---|---|---|
-| `zone_flood_score` | High | Directly correlates with physical access disruption. |
-| `zone_aqi_score` | Medium-High | Causes health-related log-offs and reduced order volume. |
-| `historical_claim_rate` | Medium | Flags repeat "hotspots" of disruption across the fleet. |
-| `shift_pattern_score` | Medium | Evening riders face higher visibility and traffic-related risk. |
-| `city_tier` | Low | Metro zones have higher base infrastructure but higher congestion. |
+- **Hyperlocal Baselines**: `zone_flood_score` (0-10) uses **3-year historical IMD archives** to weight pincodes by flooding frequency.
+- **Environmental Risk**: `zone_aqi_score` (0-10) reflects seasonal **CPCB pollution peaks** around the dark store.
+- **Operational Exposure**: `shift_pattern_score` account for the specific vulnerability of the rider's shift window.
 
-**3. Our Approach: Explainable & Equitable AI**
-- **Hyperlocal Context:** Unlike traditional insurance that uses city-wide data, our model operates on **pincode-level granularity**, ensuring a rider in a safe pocket of a high-risk city isn't unfairly penalized.
-- **Rider Transparency:** The "Risk Profile" screen in the PWA translates these 6 features into human-readable scores (e.g., "Critical AQI Risk"), making the premium loading transparent and justifiable.
-- **Regularization:** Standard regularization techniques are applied to handle the "cold-start" problem for new dark stores with limited historical claim data.
+**3. Our Approach: Hyperlocal & Data-Driven**
+- **Precision**: Unlike city-wide insurance, we operate at **pincode-level granularity**, matching the 2km Q-Commerce delivery radius.
+- **Project Status**: The full pipeline—from data generation (`ml/generate_risk_data.py`) to the trained model (`risk_score_model.pkl`) and PWA integration—is **fully built and functional**.
 
 **4. Core Assumptions**
-- **Disruption Stationarity:** We assume that 3-year historical climate patterns are a valid predictive baseline for the upcoming 4-week policy window.
-- **Pincode Centricity:** The model assumes the rider spends >80% of their shift within the 2km radius of their registered dark store.
-- **Linear Feature Accumulation:** We assume that multiple risks (e.g., Heat + AQI) have an additive effect on the probability of a disruption event.
+- **Centricity**: The model assumes the rider spends >80% of their shift within the 2km radius of their dark store.
+- **Stationarity**: Historical risk remains a valid predictive baseline for the 1-week policy window.
+
+---
+
 
 ---
 
@@ -411,20 +404,24 @@ The backend manages rider registration, ML pricing logic, and payout logs.
    - Save the JSON file as `serviceAccountKey.json` and place it in the `backend/` root directory.
    - Create a `.env` file in the `backend/` directory (copying from `.env.example`).
    - Ensure the `.env` file contains: `FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json` and your `PROJECT_ID`.
-5. Launch the API:
+5. **Initialize Database (Example Data):**
+   Run the seeding script to set up mock riders, platform activity, and historical payout logs needed for the demo:
+   ```bash
+   python seed_db.py
+   ```
+6. Launch the API:
    ```bash
    python -m uvicorn app.main:app --reload
    ```
-   *The API will be live at `http://localhost:8000`. Test via `/docs` (Swagger).*
+   *The API will be live at `http://localhost:8000`. Test via `/docs` (Swagger). Ensure `ENVIRONMENT=development` is set in your `.env` to enable the bypass of real Firebase token checks for mock login.*
 
 ### 3. ML Model Initialization
 The risk scoring system requires the XGBoost model to be trained on historical benchmarks before it can provide pricing.
 
 ```bash
-# From the root directory:
-cd ml
-python generate_risk_data.py
-python train_risk_model.py
+# From the project root (with venv activated):
+python ml/generate_risk_data.py
+python ml/train_risk_model.py
 ```
 *This generates a `risk_score_model.pkl` in `ml/models/` which the backend loads on startup.*
 
@@ -432,7 +429,7 @@ python train_risk_model.py
 This process simulates the continuous monitoring of weather, AQI, and platform status.
 
 ```bash
-# From the root directory:
+# In a NEW terminal (with backend venv activated):
 cd trigger-engine
 python main.py
 ```

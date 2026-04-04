@@ -1,6 +1,6 @@
 from firebase_admin import firestore
-from datetime import datetime
-from app.models.trigger import TriggerEvent, TriggerType
+from datetime import datetime, timedelta
+from app.models.trigger import TriggerEvent
 import uuid
 
 def get_db():
@@ -30,7 +30,7 @@ async def process_trigger_event(event: TriggerEvent):
     # Clean the zone_id input to prevent whitespace mismatches
     clean_zone_id = str(event.zone_id).strip()
     riders_ref = db.collection("riders").where("dark_store_pincode", "==", clean_zone_id)
-    riders = riders_ref.stream()
+    riders = list(riders_ref.stream())
     
     payouts = []
     for rider in riders:
@@ -41,6 +41,16 @@ async def process_trigger_event(event: TriggerEvent):
         if not data.get("active_policy"):
             continue
             
+        # Check for policy expiration
+        valid_until_str = data.get("valid_until")
+        if valid_until_str:
+            try:
+                valid_until = datetime.fromisoformat(valid_until_str)
+                if datetime.utcnow() > valid_until:
+                    continue # Policy expired!
+            except ValueError:
+                pass
+            
         # Grace Period Check (fetch latest from platform_data)
         platform_id = data.get("platform_id", "").upper().strip()
         active_days = 0
@@ -49,7 +59,7 @@ async def process_trigger_event(event: TriggerEvent):
             if p_doc.exists:
                 active_days = p_doc.to_dict().get("active_days", 0)
         
-        if active_days < 0: # CHANGED: Reduced from 7 to 0 for demo purposes
+        if active_days < 7: # Restored from 0 to 7 to enforce real eligibility
             db.collection("payout_logs").add({
                 "rider_id": rider_id,
                 "trigger_id": trigger_id,
@@ -60,18 +70,20 @@ async def process_trigger_event(event: TriggerEvent):
             })
             continue
 
-        # NEW: Solid Idempotency Check (Python Memory Filter to avoid Index issues)
-        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+        # Idempotency Check (2-second window for ultra-responsive stress testing)
+        short_window = (datetime.utcnow() - timedelta(seconds=2)).isoformat()
         
         # Basic query only (No Index Required)
-        existing_docs = db.collection("payout_logs").where("rider_id", "==", rider_id).limit(30).get()
+        existing_docs = db.collection("payout_logs") \
+                          .where("rider_id", "==", rider_id) \
+                          .limit(10).get()
             
         is_duplicate = False
         for doc in existing_docs:
             p_data = doc.to_dict()
             if p_data.get("trigger_type") == event.trigger_type and \
                p_data.get("status") == "completed" and \
-               p_data.get("timestamp", "") >= today_start:
+               p_data.get("timestamp", "") >= short_window:
                 is_duplicate = True
                 break
                 
@@ -79,19 +91,7 @@ async def process_trigger_event(event: TriggerEvent):
             print(f"DEBUG: [ENGINE] Skipping duplicate for {rider_id}")
             continue
 
-        # NEW: Tiered Payout Logic (Matching shared slides)
-        # 1. Trigger fires -> 2. Policy Checked -> 3. Fraud Verified -> 4. Payout Released
-        
-        # Fraud Verification Simulation (GPS & Platform Active Status)
-        # In a real app, this would query a real GPS stream
-        print(f"DEBUG: [VETTING] Performing GPS cross-check for {rider_id}")
-        fraud_check_passed = True # Simulation
-        
-        if not fraud_check_passed:
-            continue
-
-        # 4. Dynamic Payout Base (README Formula: (Daily Avg) * 0.70)
-        # Low (Avg 600) -> 420, Mid (Avg 900) -> 630, High (Avg 1150) -> 805
+        # Tiered Payout Logic
         tier_payout_map = {
             'low': 420.0,
             'mid': 630.0,
@@ -102,20 +102,19 @@ async def process_trigger_event(event: TriggerEvent):
         base_payout_for_tier = tier_payout_map.get(income_tier, 630.0)
         
         if event.severity <= 5.0:
-            multiplier = 0.30 # 30% Payout
+            multiplier = 0.30 
         elif event.severity <= 8.0:
-            multiplier = 0.60 # 60% Payout
+            multiplier = 0.60 
         else:
-            multiplier = 1.0  # 100% Payout
+            multiplier = 1.0  
             
         payout_amount = base_payout_for_tier * multiplier
             
-        # Execute Payout (Mock)
         payout_id = str(uuid.uuid4())
         payout_entry = {
             "payout_id": payout_id,
             "rider_id": rider_id,
-            "name": data.get("name"),
+            "name": data.get("name", "Rider"),
             "trigger_id": trigger_id,
             "amount": payout_amount,
             "trigger_type": event.trigger_type,
@@ -124,15 +123,9 @@ async def process_trigger_event(event: TriggerEvent):
             "timestamp": datetime.utcnow().isoformat()
         }
         
-        # Write payout
         db.collection("payout_logs").document(payout_id).set(payout_entry)
         payouts.append(payout_entry)
         
-    return {
-        "trigger_id": trigger_id,
-        "affected_count": len(payouts),
-        "payouts": payouts
-    }        
     return {
         "trigger_id": trigger_id,
         "affected_count": len(payouts),
