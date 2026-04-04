@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(
-    prefix="/api/platforms",
+    prefix="/platforms",
     tags=["Platform Mocks"]
 )
 

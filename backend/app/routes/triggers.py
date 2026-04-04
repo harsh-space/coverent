@@ -3,7 +3,7 @@ from app.models.trigger import TriggerEvent
 from app.services import trigger_service
 
 router = APIRouter(
-    prefix="/api/triggers",
+    prefix="/triggers",
     tags=["Triggers"]
 )
 

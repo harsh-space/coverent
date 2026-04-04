@@ -38,9 +38,9 @@ app.add_middleware(
 )
 
 #Register routers
-app.include_router(riders.router)
-app.include_router(platforms.router)
-app.include_router(triggers.router)
+app.include_router(riders.router, prefix="/api")
+app.include_router(platforms.router, prefix="/api")
+app.include_router(triggers.router, prefix="/api")
 
 @app.get("/")
 def health_check():

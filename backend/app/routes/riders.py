@@ -5,7 +5,7 @@ import traceback
 from app.services.ml_service import ml_service
 
 router = APIRouter(
-    prefix="/api/riders",
+    prefix="/riders",
     tags=["Riders"]
 )
 
