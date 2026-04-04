@@ -234,9 +234,6 @@ The engine uses an `XGBRegressor` with a `reg:squarederror` objective to predict
 
 ---
 
-
----
-
 ### Model 2 — Fraud Detection Engine
 
 **Job:** Validate every auto-triggered claim before payout releases. CLEAR → instant payout. FLAG → manual review.
