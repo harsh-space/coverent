@@ -1,6 +1,12 @@
 # Coverent
 ## Parametric Income Insurance for Q-Commerce Riders
 
+**Live Demo Links:**
+- **Rider PWA:** [coverent.vercel.app/onboarding](https://coverent.vercel.app/onboarding)
+- **Insurer Dashboard:** [coverent-insurer-dashboard.vercel.app](https://coverent-insurer-dashboard.vercel.app)
+
+---
+
 > Automated weekly income protection for Zepto / Blinkit / Swiggy Instamart delivery partners. When a disruption is detected, the payout goes out automatically. No claim forms. No waiting.
 
 ---
