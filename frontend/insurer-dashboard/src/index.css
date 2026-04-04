@@ -42,4 +42,6 @@
 .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
 
 @keyframes slide-in-from-right { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-.animate-slide-in { animation: slide-in-from-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slide-in { animation: slide-in-from-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }.tab-active { @apply bg-brand-yellow text-ui-black shadow-sm; }
+.tab-inactive { @apply hover:bg-ui-gray-light/30 text-ui-gray-dark border border-transparent; }
+.card-premium { @apply bg-ui-white border border-ui-gray-light rounded-2xl shadow-sm transition-all hover:shadow-md; }

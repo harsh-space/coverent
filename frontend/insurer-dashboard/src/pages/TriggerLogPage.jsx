@@ -1,13 +1,4 @@
-import { useState, useCallback } from "react";
-
-const INITIAL_TRIGGERS = [
-  { id: "TRG-001", trigger: "Rainfall", zone: "Rohini (110085)", value: "72 mm", threshold: "> 64.5 mm", status: "TRIGGERED", affected_riders: 23, time: "2:10 PM" },
-  { id: "TRG-002", trigger: "AQI", zone: "Dwarka (110075)", value: "410", threshold: "> 300", status: "TRIGGERED", affected_riders: 15, time: "6:40 PM" },
-  { id: "TRG-003", trigger: "Temperature", zone: "Noida (201301)", value: "42°C", threshold: "> 45°C", status: "MONITORING", affected_riders: 0, time: "1:00 PM" },
-  { id: "TRG-004", trigger: "Rainfall", zone: "Gurgaon (122001)", value: "81 mm", threshold: "> 64.5 mm", status: "TRIGGERED", affected_riders: 31, time: "3:25 PM" },
-];
-
-const SIM_ZONES = ["Connaught Place (110001)", "Hauz Khas (110016)", "Vasant Kunj (110070)", "Janakpuri (110058)"];
+import { useDashboard } from "../context/DashboardContext";
 
 const TRIGGER_BADGE = {
   TRIGGERED: "bg-status-red/10 text-status-red border-status-red",
@@ -15,32 +6,7 @@ const TRIGGER_BADGE = {
 };
 
 export default function TriggerLogPage() {
-  const [triggerRows, setTriggerRows] = useState(INITIAL_TRIGGERS);
-  const [simulating, setSimulating] = useState(false);
-
-  const handleSimulate = useCallback(() => {
-    setSimulating(true);
-    setTimeout(() => {
-      const zone = SIM_ZONES[Math.floor(Math.random() * SIM_ZONES.length)];
-      const rainfall = Math.floor(Math.random() * 40) + 60;
-      const riders = Math.floor(Math.random() * 30) + 5;
-      const hour = Math.floor(Math.random() * 12) + 1;
-      const min = Math.floor(Math.random() * 60);
-      const ampm = Math.random() > 0.5 ? "PM" : "AM";
-      const newTrigger = {
-        id: `TRG-${String(triggerRows.length + 1).padStart(3, "0")}`,
-        trigger: "Rainfall",
-        zone,
-        value: `${rainfall} mm`,
-        threshold: "> 64.5 mm",
-        status: rainfall > 64.5 ? "TRIGGERED" : "MONITORING",
-        affected_riders: rainfall > 64.5 ? riders : 0,
-        time: `${hour}:${String(min).padStart(2, "0")} ${ampm}`,
-      };
-      setTriggerRows((prev) => [newTrigger, ...prev]);
-      setSimulating(false);
-    }, 600);
-  }, [triggerRows.length]);
+  const { triggers } = useDashboard();
 
   return (
     <div className="flex flex-col gap-8 pb-10 text-ui-black font-sans">
@@ -58,28 +24,20 @@ export default function TriggerLogPage() {
             <p className="text-sm font-bold text-ui-gray-dark">Live Environmental Tracking</p>
           </div>
         </div>
-
-        <button
-          onClick={handleSimulate}
-          disabled={simulating}
-          className={`${simulating ? "opacity-50 grayscale cursor-not-allowed shadow-none" : ""} btn-primary shrink-0`}
-        >
-          {simulating ? "Simulating..." : (<>Fire Simulator <span className="ml-1">→</span></>)}
-        </button>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
            <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Triggered Logs</p>
-           <p className="text-2xl font-black text-status-red tracking-tight">{triggerRows.filter(t => t.status === "TRIGGERED").length}</p>
+           <p className="text-2xl font-black text-status-red tracking-tight">{triggers.filter(t => t.status === "TRIGGERED").length}</p>
         </div>
         <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
            <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Monitoring Active</p>
-           <p className="text-2xl font-black text-status-green tracking-tight">{triggerRows.filter(t => t.status === "MONITORING").length}</p>
+           <p className="text-2xl font-black text-status-green tracking-tight">{triggers.filter(t => t.status === "MONITORING").length}</p>
         </div>
         <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
            <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Impacted Personnel</p>
-           <p className="text-2xl font-black text-ui-black tracking-tight">{triggerRows.reduce((a, b) => a + b.affected_riders, 0)}</p>
+           <p className="text-2xl font-black text-ui-black tracking-tight">{triggers.reduce((a, b) => a + (b.affected_riders || 0), 0)}</p>
         </div>
       </div>
 
@@ -98,7 +56,7 @@ export default function TriggerLogPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-ui-gray-light/50">
-              {triggerRows.map((row) => (
+              {triggers.map((row) => (
                 <tr key={row.id} className="hover:bg-ui-gray-light/10 transition-colors duration-200">
                   <td className="px-6 py-4 text-sm font-black text-ui-black tracking-tight">{row.trigger}</td>
                   <td className="px-6 py-4 text-sm font-bold text-ui-gray-dark tracking-tight">{row.zone}</td>

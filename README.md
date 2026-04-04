@@ -1,4 +1,4 @@
-# GigShield 
+# Coverent
 ## Parametric Income Insurance for Q-Commerce Riders
 
 > Automated weekly income protection for Zepto / Blinkit / Swiggy Instamart delivery partners. When a disruption is detected, the payout goes out automatically. No claim forms. No waiting.
@@ -11,7 +11,7 @@ A full-time Blinkit or Zepto rider earns ₹800–₹1,200/day working 9–10 ho
 
 One flooded road, one severe AQI day, one platform outage during peak hours — and that day's income is gone. No compensation. No safety net. Over a Delhi monsoon season, riders lose 4–6 such days, translating to ₹3,800–₹5,700 in unprotected income loss.
 
-GigShield insures that lost income — automatically, weekly, and built exclusively for Q-Commerce riders.
+Coverent insures that lost income — automatically, weekly, and built exclusively for Q-Commerce riders.
 
 ---
 
@@ -33,9 +33,9 @@ The 10-minute delivery promise means even a 45-minute disruption during peak hou
 
 Ravi earns ₹950/day from a dark store in Rohini. On August 13, 2024, IMD issues a Red Alert for Delhi-NCR — two roads within 2km of his store are waterlogged by 11 AM. He cannot safely ride.
 
-**Without GigShield:** ₹950 gone. Over 4–6 such days per monsoon season, that's ₹3,800–₹5,700 with zero recourse.
+**Without Coverent:** ₹950 gone. Over 4–6 such days per monsoon season, that's ₹3,800–₹5,700 with zero recourse.
 
-**With GigShield:** IMD Red Alert + maps API confirms flooding within 2km of his dark store. Trigger fires. ₹665 credited to UPI by 2 PM — while the roads are still flooded.
+**With Coverent:** IMD Red Alert + maps API confirms flooding within 2km of his dark store. Trigger fires. ₹665 credited to UPI by 2 PM — while the roads are still flooded.
 
 ---
 
@@ -43,9 +43,9 @@ Ravi earns ₹950/day from a dark store in Rohini. On August 13, 2024, IMD issue
 
 Priya works the 6–11 PM peak slot in Dwarka, earning ₹780/evening. On November 18, 2024, Delhi's AQI hits 491. She logs off after 90 minutes — 6 orders instead of 18–20. Evening earnings: ₹210.
 
-**Without GigShield:** ₹570 lost. Delhi's AQI exceeded 400 for 9 consecutive days in November 2024 with zero recourse.
+**Without Coverent:** ₹570 lost. Delhi's AQI exceeded 400 for 9 consecutive days in November 2024 with zero recourse.
 
-**With GigShield:** AQI ≥301 confirmed in Dwarka for 3+ consecutive hours during her active shift. Trigger fires. ₹455 to UPI within 2 hours.
+**With Coverent:** AQI ≥301 confirmed in Dwarka for 3+ consecutive hours during her active shift. Trigger fires. ₹455 to UPI within 2 hours.
 
 ---
 
@@ -54,9 +54,9 @@ Priya works the 6–11 PM peak slot in Dwarka, earning ₹780/evening. On Novemb
 Arjun earns ₹1,050/day in Andheri West. On a Friday at 7:23 PM, Swiggy's order-assignment system goes down for 52 minutes. He 
 completes 4 orders instead of his usual 14 and misses his weekly incentive milestone by the exact orders the outage cost him.
 
-**Without GigShield:** ₹280 order loss + ₹300 missed bonus = ₹580 gone on a single Friday night.
+**Without Coverent:** ₹280 order loss + ₹300 missed bonus = ₹580 gone on a single Friday night.
 
-**With GigShield:** Downtime >45 minutes during peak detected. GPS confirms Arjun was active in zone. Fraud check clears. ₹385 to UPI before midnight.
+**With Coverent:** Downtime >45 minutes during peak detected. GPS confirms Arjun was active in zone. Fraud check clears. ₹385 to UPI before midnight.
 
 ---
 
@@ -81,7 +81,7 @@ The insurer-side user monitors live triggers, reviews flagged claims, and tracks
 ### Rider PWA (6 Steps)
 
 **Step 1 — Onboarding (one-time, ~3 min)**
-OTP login → select platform → platform ID upload → Aadhaar eKYC → dark store pincode → UPI ID → income tier (Low/Mid/High).
+Phone login → select platform → platform ID → dark store pincode → UPI ID → income tier (Low/Mid/High) → shift window.
 
 **Step 2 — AI Risk Profiling (automatic, ~60 sec)**
 No rider action. Zone scored (0–100) from historical weather + AQI data. Rider sees: *"Zone risk: 74/100. 
@@ -116,7 +116,7 @@ Amount calculated → sent to UPI → push notification to rider. Target: within
 
 ### Why Weekly?
 
-77.6% of gig workers in India earn ₹2.5 lakh or less per year. Zepto and Blinkit both run weekly payout cycles (Monday–Sunday, credited by Tuesday). GigShield's premium deducts from that payout automatically — the rider never needs to actively pay. Zero friction, zero defaults.
+77.6% of gig workers in India earn ₹2.5 lakh or less per year. Zepto and Blinkit both run weekly payout cycles (Monday–Sunday, credited by Tuesday). Coverent's premium deducts from that payout automatically — the rider never needs to actively pay. Zero friction, zero defaults.
 
 ### Income Tiers
 
@@ -131,7 +131,7 @@ Amount calculated → sent to UPI → push notification to rider. Target: within
 ### Premium Formula
 
 ```
-Weekly Premium = Base Premium + AI Risk Loading
+Weekly Premium = (Base Premium + AI Risk Loading) × Plan Multiplier
 ```
 
 **Base Premium — 2.5% of weekly income (parametric microinsurance benchmark)**
@@ -143,6 +143,7 @@ Weekly Premium = Base Premium + AI Risk Loading
 | High | ₹179/week |
 
 **AI Risk Loading — XGBoost model, range: -₹20 to +₹30**
+Calculated at onboarding based on zone history. Neutral score = 74.
 
 | Input Feature | Source | Weight |
 |---|---|---|
@@ -155,27 +156,37 @@ Weekly Premium = Base Premium + AI Risk Loading
 
 *Example: Mid-tier rider in Rohini, Delhi pays ₹169/week. Same tier in Kharadi, Pune pays ₹119/week.*
 
-### Coverage Plans
+### Coverage Plans (Mid-Tier Benchmark)
 
 | Plan | Max Covered Days/Week | Max Payout/Week |
 |---|---|---|
-| Suraksha Lite | 1 day | ₹700 |
-| Suraksha Plus | 2 days | ₹1,400 |
-| Suraksha Max | 3 days | ₹2,100 |
+| Suraksha Lite | 1 day | ₹630 |
+| Suraksha Plus | 2 days | ₹1,260 |
+| Suraksha Max | 3 days | ₹1,890 |
 
 ### Payout Formula
+
 ```
-Payout = (Declared weekly income ÷ 6) × 0.70 × Disrupted days
+Payout = Base Daily Payout × Severity Multiplier
 ```
+*Where Base Daily Payout = (Weekly Income ÷ 6) × 0.70*
 
 The 0.70 factor prevents over-insurance moral hazard.
 
-**Example:** `(₹5,400 ÷ 6) × 0.70 × 1 = ₹630 → UPI within 2 hours`
+**Severity Multiplier (Based on API Trigger Intensity)**
+- **Moderate (≤ 5.0):** 30% Payout
+- **High (≤ 8.0):** 60% Payout
+- **Severe (> 8.0):** 100% Payout
+
+**Example:** Mid-tier rider earning ₹5,400/week during a "Severe" Rainfall trigger (Intensity 9.2) receives `(₹5,400 ÷ 6) × 0.70 × 1.0 = ₹630 → UPI within 2 hours`.
 
 **Loss ratio estimate** (10,000 riders, Delhi-NCR + Mumbai):
 - Peak monsoon (1.2 disrupted days/rider/week): ~45%
 - Off-season (0.3 days/week): ~11%
 - **Blended annual: ~28%** — commercially sustainable
+
+### Hyperlocal Pool Protection
+**Coverent** implements a safety valve at the pincode level. If a specific zone's loss ratio exceeds **85%**, new policy enrollments are paused to guarantee full payouts for existing members.
 
 ---
 
@@ -202,6 +213,34 @@ Three models. Each has one job, specific inputs, and a specific output.
 **Algorithm:** XGBoost Regressor — best-performing model for tabular insurance risk data with mixed feature types.
 **Inputs (6):** 3-year waterlogging frequency, seasonal AQI score, city tier, zone composite risk score, shift window, prior claim count.
 **Output:** Risk score (0–100) → premium adjustment (-₹20 to +₹30). Runs at onboarding, refreshed every 4 weeks.
+
+#### XGBoost Model Architecture & Approach
+
+**1. Model Objective & Hyperparameters**
+The engine uses an `XGBRegressor` with a `reg:squarederror` objective to predict a continuous risk score. To ensure a balance between accuracy and computational efficiency for mobile onboarding, we use:
+- **n_estimators:** 100
+- **max_depth:** 5
+- **learning_rate:** 0.1
+- **Random State:** 42 (for reproducible risk scoring)
+
+**2. Feature Engineering Logic**
+| Feature | Weight (Approx) | Rationale |
+|---|---|---|
+| `zone_flood_score` | High | Directly correlates with physical access disruption. |
+| `zone_aqi_score` | Medium-High | Causes health-related log-offs and reduced order volume. |
+| `historical_claim_rate` | Medium | Flags repeat "hotspots" of disruption across the fleet. |
+| `shift_pattern_score` | Medium | Evening riders face higher visibility and traffic-related risk. |
+| `city_tier` | Low | Metro zones have higher base infrastructure but higher congestion. |
+
+**3. Our Approach: Explainable & Equitable AI**
+- **Hyperlocal Context:** Unlike traditional insurance that uses city-wide data, our model operates on **pincode-level granularity**, ensuring a rider in a safe pocket of a high-risk city isn't unfairly penalized.
+- **Rider Transparency:** The "Risk Profile" screen in the PWA translates these 6 features into human-readable scores (e.g., "Critical AQI Risk"), making the premium loading transparent and justifiable.
+- **Regularization:** Standard regularization techniques are applied to handle the "cold-start" problem for new dark stores with limited historical claim data.
+
+**4. Core Assumptions**
+- **Disruption Stationarity:** We assume that 3-year historical climate patterns are a valid predictive baseline for the upcoming 4-week policy window.
+- **Pincode Centricity:** The model assumes the rider spends >80% of their shift within the 2km radius of their registered dark store.
+- **Linear Feature Accumulation:** We assume that multiple risks (e.g., Heat + AQI) have an additive effect on the probability of a disruption event.
 
 ---
 
@@ -238,7 +277,7 @@ Three models. Each has one job, specific inputs, and a specific output.
 > **Context:** A coordinated ring of 500 riders using GPS spoofing
 > apps can fake their location into a Red Alert zone and trigger
 > mass auto-payouts. Simple GPS verification is insufficient.
-> GigShield defends at three layers.
+> Coverent defends at three layers.
 
 ---
 
@@ -310,7 +349,7 @@ A rider with a genuine network drop should never lose their payout.
 | Backend | Python + FastAPI | Beginner-friendly, auto Swagger docs at /docs, async support for trigger polling |
 | Database | Firebase Firestore | Zero setup, real-time sync, free tier (50k reads/day), no SQL required |
 | Auth | Firebase Auth | OTP-based mobile login, free |
-| ML | scikit-learn + xgboost + TensorFlow/Keras | Industry standard, best documentation, beginner accessible |
+| ML | scikit-learn + xgboost | Industry standard, best documentation, beginner accessible |
 | Payments | Razorpay (test mode) | Free sandbox, UPI support |
 | Hosting | Vercel (frontend) + Render.com (backend) | Both free tier, zero DevOps overhead |
 
@@ -324,16 +363,136 @@ A rider with a genuine network drop should never lose their payout.
 | AQICN | Real-time AQI by city/pincode | Free |
 | Google Maps / OpenStreetMap | 2km radius zone check, flood layer | Free |
 | Razorpay | Payout sandbox | Free |
-| React Router | PWA screen navigation | — |
+| React Router | PWA and Dashboard navigation | — |
 | Recharts | Insurer dashboard analytics charts | — |
-| Leaflet.js | Live trigger map with zone overlays | — |
-| Axios | Frontend → backend API calls | — |
+| Lucide React | High-fidelity iconography | — |
 | Firebase Cloud Messaging | Push notifications to rider PWA | — |
 
 **Simulated in-house (mock FastAPI endpoints):**
 - Platform order completion rate by zone
 - Platform outage status feed
 - Municipal zone closure alert feed
+
+---
+
+## Local Development Setup
+
+To run **Coverent** locally on your workstation, follow these steps in order.
+
+### 1. Prerequisites
+- **Python 3.9+**
+- **Node.js (v18+) & npm**
+- **Firebase Account** (Firestore & Auth enabled)
+- **Git** (for cloning)
+
+### 2. Backend Environment (FastAPI)
+The backend manages rider registration, ML pricing logic, and payout logs.
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   # On Windows:
+   .\venv\Scripts\activate
+   # On macOS/Linux:
+   source venv/bin/activate
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. **Firebase Configuration:**
+   - Go to the [Firebase Console](https://console.firebase.google.com/).
+   - Click the gear icon (Project Settings) > **Service Accounts**.
+   - Click **Generate new private key**.
+   - Save the JSON file as `serviceAccountKey.json` and place it in the `backend/` root directory.
+   - Create a `.env` file in the `backend/` directory (copying from `.env.example`).
+   - Ensure the `.env` file contains: `FIREBASE_CREDENTIALS_PATH=serviceAccountKey.json` and your `PROJECT_ID`.
+5. Launch the API:
+   ```bash
+   python -m uvicorn app.main:app --reload
+   ```
+   *The API will be live at `http://localhost:8000`. Test via `/docs` (Swagger).*
+
+### 3. ML Model Initialization
+The risk scoring system requires the XGBoost model to be trained on historical benchmarks before it can provide pricing.
+
+```bash
+# From the root directory:
+cd ml
+python generate_risk_data.py
+python train_risk_model.py
+```
+*This generates a `risk_score_model.pkl` in `ml/models/` which the backend loads on startup.*
+
+### 4. Trigger Engine (Background Polling)
+This process simulates the continuous monitoring of weather, AQI, and platform status.
+
+```bash
+# From the root directory:
+cd trigger-engine
+python main.py
+```
+*The engine polls every 30 seconds and POSTS threshold breaches to the backend.*
+
+### 5. Frontend Dashboards
+
+#### Rider PWA (Mobile Experience)
+```bash
+cd frontend/rider-pwa
+npm install
+npm run dev
+```
+*Open `http://localhost:5173`. Use mobile view in DevTools for the best experience.*
+
+#### Insurer Dashboard (Admin/Analytical View)
+```bash
+cd frontend/insurer-dashboard
+npm install
+npm run dev
+```
+*Open `http://localhost:5173` (or the next available port).*
+
+---
+
+## Demo Flow
+
+Follow this 5-minute walkthrough to experience the full **Coverent** parametric lifecycle across all three interfaces.
+
+### 1. Rider Onboarding (PWA)
+- Open the **Rider PWA** (`http://localhost:5173`).
+- Select **"Create New Account"**.
+- Fill in details. **Critically, remember the Pincode you use (e.g., 400053).**
+- Click **"Generate AI Risk Profile"**. Watch the XGBoost model calculate your zone-specific risk loading in real-time.
+- Select **"Suraksha Plus"** and click **"Setup Auto-Mandate"**. Your policy is now active for the current week.
+
+### 2. Monitor Coverage (PWA Dashboard)
+- You are now on the **Rider Dashboard**.
+- Note the status: **"Active Protection"**.
+- Payout History will be empty.
+
+### 3. Simulate a Disruption (Insurer Dashboard)
+- Open the **Insurer Dashboard** (`http://localhost:5174`).
+- Navigate to the **"Mock Triggers"** tab on the sidebar.
+- **Manual Trigger:** 
+    - Select a trigger type (e.g., **Heavy Rainfall**).
+    - Select the **Zone/Pincode** you used in Step 1.
+    - Set Intensity to **"Severe"**.
+    - Click **"Authorize Manual Trigger"**.
+
+### 4. Instant Payout Verification (PWA)
+- Switch back to the **Rider PWA**.
+- The Dashboard will update automatically (via Firebase sync).
+- A **"New Payout"** alert will appear with the calculated amount (e.g., ₹630).
+- Check the **"Transaction History"** at the bottom to see the completed UPI transfer log.
+
+### 5. Audit & Global Analytics (Insurer)
+- Switch back to the **Insurer Dashboard**.
+- Go to the **"Claims Audit"** tab to see the rider's fraud-verified claim log.
+- Go to **"Analytics"** to see the Pincode's Loss Ratio and the total disbursed funds update on the live charts.
 
 ---
 
@@ -394,12 +553,13 @@ Goal: Both dashboards complete, end-to-end connected, demo-ready.
 
 | Assumption | Detail |
 |---|---|
-| Income verification | Self-declared, cross-checked against earnings screenshot. Production uses direct platform API. |
+| Income verification | Self-declared, cross-checked against earnings screenshot. |
+| Platform Data Sync | Rider eligibility is synced with a mock platform database; 7 active days required for claim activation. |
+| Fraud Verification | Simulated GPS & activity cross-check ensures rider was active in zone during trigger event. |
+| Idempotency | System prevents duplicate payouts for the same trigger event type within a 24-hour window. |
 | Geographic scope | Delhi-NCR, Mumbai, Bengaluru. Tier-2 expansion supported but not demoed. |
-| Working days | Riders working fewer than 6 days/week are not penalised — formula uses declared weekly income. |
-| Platform data | No public APIs for completion rates or outage status — simulated via mock endpoints. |
-| Rider GPS | Last recorded ping at trigger time only — not continuous tracking. |
-| Payout timeline | "Within 2 hours" reflects sandbox. Real UPI transfers typically under 10 minutes. |
+| Platform data | Simulated via mock endpoints for completion rates and outage status. |
+| Payout timeline | Target: within 2 hours of trigger (sandbox mode). |
 
 ### Out of Scope
 

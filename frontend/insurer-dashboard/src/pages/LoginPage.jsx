@@ -34,7 +34,7 @@ export default function LoginPage() {
                 <path d="m9 12 2 2 4-4" />
              </svg>
           </div>
-          <h1 className="text-4xl font-black tracking-tight mb-1 text-ui-black">GigShield</h1>
+          <h1 className="text-4xl font-black tracking-tight mb-1 text-ui-black">Coverent</h1>
           <p className="text-sm font-bold text-ui-gray-dark">Insurer Gateway Authentication</p>
         </div>
 

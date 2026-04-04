@@ -1,0 +1,10 @@
+pincode,city,flood_score,aqi_score,city_tier,loss_ratio
+400053,Mumbai (Andheri West),9,6,1,45
+110001,Delhi (Connaught Place),2,10,1,12
+560001,Bangalore (MG Road),5,4,1,33
+600001,Chennai (Parrys),8,3,1,78
+700001,Kolkata (BBD Bagh),7,5,1,61
+400099,Mumbai (Sahar/Airport),10,8,1,92
+122018,Gurgaon,3,9,0,15
+411001,Pune (Camp),4,5,0,28
+380001,Ahmedabad (Khadia),2,6,0,11
