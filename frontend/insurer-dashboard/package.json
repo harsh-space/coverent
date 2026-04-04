@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "npx vite preview"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "react": "^19.2.4",
