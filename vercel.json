@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/vercel_app.py",
+      "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
         "maxDuration": 10
@@ -19,7 +19,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/vercel_app.py"
+      "dest": "api/index.py"
     },
     {
       "src": "/(.*)",
