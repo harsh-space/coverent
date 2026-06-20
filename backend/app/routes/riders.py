@@ -3,6 +3,10 @@ from app.models.rider import RiderRegistrationRequest, RiderRegisterResponse, Ri
 from app.services import rider_service
 import traceback
 from app.services.ml_service import ml_service
+from pydantic import BaseModel
+
+class ProfileUpdateRequest(BaseModel):
+    fcm_token: str
 
 router = APIRouter(
     prefix="/riders",
@@ -35,6 +39,20 @@ async def get_rider_profile(rider_id: str):
         return profile
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        traceback.print_exc()
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
+
+@router.put("/profile/{rider_id}")
+async def update_rider_profile(rider_id: str, request: ProfileUpdateRequest):
+    try:
+        from app.services.trigger_service import get_db
+        db = get_db()
+        db.collection("riders").document(rider_id).update({
+            "fcm_token": request.fcm_token
+        })
+        return {"status": "success"}
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")

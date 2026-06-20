@@ -1,7 +1,9 @@
-from firebase_admin import firestore
+from firebase_admin import firestore, messaging
 from datetime import datetime, timedelta
 from app.models.trigger import TriggerEvent
 import uuid
+import random
+from app.services.ml_service import ml_service
 
 def get_db():
     return firestore.client()
@@ -111,6 +113,36 @@ async def process_trigger_event(event: TriggerEvent):
         payout_amount = base_payout_for_tier * multiplier
             
         payout_id = str(uuid.uuid4())
+        
+        # --- ML FRAUD ENGINE INTEGRATION ---
+        # Simulate 5-signal data for the fraud engine
+        # 5% chance of simulating a spoofer to demonstrate the Isolation Forest
+        is_simulated_spoofer = random.random() < 0.05
+        
+        if is_simulated_spoofer:
+            claim_data = {
+                'location_continuity': random.uniform(0.0, 0.3),
+                'accelerometer_variance': random.gauss(0.2, 0.1),
+                'minutes_active_pre_trigger': random.randint(0, 5),
+                'cell_tower_mismatch_meters': random.uniform(2000, 10000),
+                'zone_history_deliveries': random.randint(0, 2)
+            }
+        else:
+            claim_data = {
+                'location_continuity': random.uniform(0.7, 1.0),
+                'accelerometer_variance': random.gauss(5.0, 1.5),
+                'minutes_active_pre_trigger': random.randint(20, 240),
+                'cell_tower_mismatch_meters': random.uniform(0, 800),
+                'zone_history_deliveries': random.randint(5, 200)
+            }
+            
+        # Ensure non-negative variance
+        claim_data['accelerometer_variance'] = max(0, claim_data['accelerometer_variance'])
+        
+        fraud_result = ml_service.evaluate_fraud_claim(claim_data)
+        payout_status = "flagged" if fraud_result.get("is_fraud") else "completed"
+        # -----------------------------------
+
         payout_entry = {
             "payout_id": payout_id,
             "rider_id": rider_id,
@@ -118,13 +150,32 @@ async def process_trigger_event(event: TriggerEvent):
             "trigger_id": trigger_id,
             "amount": payout_amount,
             "trigger_type": event.trigger_type,
-            "status": "completed",
+            "status": payout_status,
             "tier_percentage": int(multiplier * 100),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
+            "is_simulated_fraud": is_simulated_spoofer # added for debug visibility
         }
         
         db.collection("payout_logs").document(payout_id).set(payout_entry)
         payouts.append(payout_entry)
+        
+        # --- SEND PUSH NOTIFICATION ---
+        if payout_status == "completed":
+            fcm_token = data.get("fcm_token")
+            if fcm_token:
+                try:
+                    message = messaging.Message(
+                        notification=messaging.Notification(
+                            title=f"Instant Payout Settled: ₹{payout_amount}",
+                            body=f"Reason: {event.trigger_type.replace('_', ' ').upper()}",
+                        ),
+                        token=fcm_token,
+                    )
+                    messaging.send(message)
+                    print(f"DEBUG: [FCM] Push Notification sent to {rider_id}")
+                except Exception as e:
+                    print(f"ERROR: [FCM] Push Notification failed for {rider_id}: {e}")
+        # ------------------------------
         
     return {
         "trigger_id": trigger_id,

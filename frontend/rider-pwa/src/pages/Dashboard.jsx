@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CONFIG from '../config';
 import { useToast } from '../components/Toast';
+import { requestForToken, onMessageListener } from '../firebase';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -87,6 +88,47 @@ export default function Dashboard() {
 
     return () => clearInterval(pollPayouts);
   }, [navigate]);
+
+  // Setup Firebase Cloud Messaging (FCM)
+  useEffect(() => {
+    const setupFCM = async () => {
+      const rider_id = riderIdRef.current;
+      if (!rider_id) return;
+      
+      try {
+        // This will trigger the browser's Notification Permission prompt
+        const token = await requestForToken();
+        if (token) {
+          console.log("FCM Token retrieved, syncing to backend...");
+          await fetch(`${CONFIG.API_BASE_URL}/riders/profile/${rider_id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fcm_token: token })
+          });
+        }
+      } catch (err) {
+        console.warn("FCM Setup failed (Check placeholder keys):", err);
+      }
+    };
+    
+    setupFCM();
+
+    // Listen for foreground messages
+    const listenForeground = async () => {
+      try {
+        const payload = await onMessageListener();
+        console.log("Foreground message received:", payload);
+        if (payload?.notification) {
+          addToast(payload.notification.title, 'success');
+        }
+        // Rekey listener for the next message
+        listenForeground();
+      } catch (err) {
+        console.log('FCM listen error: ', err);
+      }
+    };
+    listenForeground();
+  }, [addToast]);
 
   const handleLogout = () => {
     localStorage.removeItem('rider_id');
