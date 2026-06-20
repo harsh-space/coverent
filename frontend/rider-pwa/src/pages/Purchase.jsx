@@ -56,7 +56,7 @@ export default function Purchase() {
     const planMapping = {
       lite: 'suraksha_basic',
       plus: 'suraksha_plus',
-      max: 'bima_elite'
+      max: 'suraksha_max'
     };
 
     try {

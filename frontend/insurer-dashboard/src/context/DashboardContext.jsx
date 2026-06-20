@@ -53,10 +53,12 @@ export function DashboardProvider({ children }) {
 
         // Update Analytics based on actual claims
         const totalPayout = claimsData.reduce((acc, p) => acc + p.amount, 0);
+        const uniqueRiders = new Set(claimsData.map(p => p.rider_id)).size;
         setAnalytics(prev => ({
           ...prev,
           totalClaims: claimsData.length,
           totalPayout: totalPayout,
+          disruptedRiders: uniqueRiders,
           lossRatio: Math.min(100, (totalPayout / (1250 * 349)) * 100 + 40) // Heuristic for demo
         }));
       }

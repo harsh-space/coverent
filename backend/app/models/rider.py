@@ -20,7 +20,8 @@ class ShiftWindow(str, Enum):
 class PolicyType(str, Enum):
     suraksha_basic = "suraksha_basic"
     suraksha_plus = "suraksha_plus"
-    bima_elite = "bima_elite"
+    suraksha_max = "suraksha_max"
+    bima_elite = "bima_elite"  # legacy alias — kept for backward compatibility
 
 class RiderRegistrationRequest(BaseModel):
     name: str

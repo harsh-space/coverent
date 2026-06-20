@@ -11,6 +11,7 @@ const ZONES = [
   { name: "Gurgaon", pin: "122018", city: "" },
   { name: "Pune Camp", pin: "411001", city: "" },
   { name: "Ahmedabad", pin: "380001", city: "Khadia" },
+  { name: "Custom Pincode", pin: "CUSTOM", city: "" },
 ];
 
 const TRIGGERS = ["Rainfall", "AQI", "Heatwave", "Waterlogging"];
@@ -103,7 +104,12 @@ export default function MockTriggersPage() {
   // Single Trigger State
   const [selectedTrigger, setSelectedTrigger] = useState(TRIGGERS[0]);
   const [selectedZone, setSelectedZone] = useState(ZONES[0]);
+  const [customPincode, setCustomPincode] = useState("");
   const [selectedIntensity, setSelectedIntensity] = useState(INTENSITIES[2]);
+
+  // Resolve the effective zone pin (custom override if CUSTOM selected)
+  const effectiveZonePin = selectedZone.pin === "CUSTOM" ? customPincode.trim() || "000000" : selectedZone.pin;
+  const effectiveZoneName = selectedZone.pin === "CUSTOM" ? `Custom Zone (${effectiveZonePin})` : `${selectedZone.name} (${selectedZone.pin})`;
 
   // Stress Test State
   const [isStressTesting, setIsStressTesting] = useState(false);
@@ -126,7 +132,7 @@ export default function MockTriggersPage() {
 
     fireTrigger({
       type: selectedTrigger,
-      zone: `${selectedZone.name} (${selectedZone.pin})`,
+      zone: effectiveZoneName,
       value,
       threshold,
       affectedRiders: Math.floor(Math.random() * 20) + 10
@@ -151,8 +157,9 @@ export default function MockTriggersPage() {
         for (let i = 0; i < fireCount; i++) {
           const type = TRIGGERS[Math.floor(Math.random() * TRIGGERS.length)];
           // Increased probability for demo zone 110001
-          const demoZone = ZONES.find(z => z.pin === "110001") || ZONES[0];
-          const zone = Math.random() > 0.4 ? demoZone : ZONES[Math.floor(Math.random() * ZONES.length)];
+          const STRESS_ZONES = ZONES.filter(z => z.pin !== "CUSTOM"); // exclude custom sentinel
+          const demoZone = STRESS_ZONES.find(z => z.pin === "110001") || STRESS_ZONES[0];
+          const zone = Math.random() > 0.4 ? demoZone : STRESS_ZONES[Math.floor(Math.random() * STRESS_ZONES.length)];
 
           fireTrigger({
             type,
@@ -243,6 +250,24 @@ export default function MockTriggersPage() {
                   icon={<svg className="w-5 h-5 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>}
                 />
               </div>
+
+              {/* Custom Pincode Input — appears when "Custom Pincode" is selected */}
+              {selectedZone.pin === "CUSTOM" && (
+                <div>
+                  <label className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-2 block pl-1">
+                    Enter Rider Pincode
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="e.g. 400053"
+                    value={customPincode}
+                    onChange={e => setCustomPincode(e.target.value.replace(/\D/g, ''))}
+                    className="w-full bg-ui-white border-2 border-brand-yellow rounded-xl px-5 py-4 font-black text-sm text-ui-black tracking-widest focus:outline-none focus:ring-4 focus:ring-brand-yellow/20 transition-all"
+                  />
+                  <p className="text-[10px] font-bold text-ui-gray-dark mt-2 pl-1">Enter the same pincode used during rider onboarding to test the end-to-end payout flow.</p>
+                </div>
+              )}
 
               <div>
                 <label className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-4 block pl-1">Threshold Intensity</label>

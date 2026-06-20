@@ -157,7 +157,7 @@ export default function Dashboard() {
   const getPolicyName = (type) => {
     if (type === 'suraksha_basic') return 'Suraksha Lite';
     if (type === 'suraksha_plus') return 'Suraksha Plus';
-    if (type === 'bima_elite') return 'Suraksha Max';
+    if (type === 'suraksha_max' || type === 'bima_elite') return 'Suraksha Max';
     return type || 'No Active Policy';
   };
 
@@ -297,21 +297,23 @@ export default function Dashboard() {
             </div>
           )}
 
-          {profile && !profile.active_policy && (
+          {profile && (!profile.active_policy || isPolicyExpired()) && (
             <div className="glass-card border-2 border-brand-yellow/30 p-5 rounded-3xl mt-4 text-center relative overflow-hidden">
               <div className="relative z-10">
                 <h3 className="font-black text-xl mb-2 flex justify-center items-center gap-2">
                   <ShieldAlert className="w-6 h-6 text-status-orange" strokeWidth={2.5} />
-                  You're Unprotected
+                  {isPolicyExpired() && profile.active_policy ? "Coverage Expired" : "You're Unprotected"}
                 </h3>
                 <p className="text-sm font-medium text-ui-gray-dark mb-5 px-2">
-                  Set up your customizable gig insurance policy now to lock in your tailored premium based on your zone profile.
+                  {isPolicyExpired() && profile.active_policy 
+                    ? "Your previous week's coverage has ended. Auto-renew your policy now to stay protected for the upcoming week." 
+                    : "Set up your customizable gig insurance policy now to lock in your tailored premium based on your zone profile."}
                 </p>
                 <button
                   onClick={() => navigate('/risk-profile')}
                   className="btn-accent w-full text-sm py-4 flex justify-center items-center gap-2"
                 >
-                  Set Up Insurance Now <Zap className="w-4 h-4" fill="currentColor" />
+                  {isPolicyExpired() && profile.active_policy ? "Renew Policy for this Week" : "Set Up Insurance Now"} <Zap className="w-4 h-4" fill="currentColor" />
                 </button>
               </div>
             </div>
