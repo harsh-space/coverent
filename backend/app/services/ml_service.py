@@ -1,5 +1,6 @@
 import joblib
 import os
+import traceback
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -13,6 +14,8 @@ class MLPricingService:
     def __init__(self):
         self.score_model = None
         self.pincode_df = None
+        self.fraud_model = None
+        self.forecaster_model = None
         self._init_done = False
 
     def _ensure_loaded(self):
@@ -36,6 +39,26 @@ class MLPricingService:
             else:
                 print(f"WARNING: [ML] Model file NOT found at {score_path}")
             
+            fraud_model_path = MODEL_DIR / 'fraud_detection_model.pkl'
+            if fraud_model_path.exists():
+                try:
+                    self.fraud_model = joblib.load(fraud_model_path)
+                    print(f"DEBUG: [ML] Fraud Model Loaded Successfully.")
+                except Exception as e:
+                    print(f"ERROR: [ML] Fraud Model Joblib load failed: {e}")
+            else:
+                print(f"WARNING: [ML] Fraud model file NOT found at {fraud_model_path}")
+
+            forecaster_path = MODEL_DIR / 'disruption_forecaster.pkl'
+            if forecaster_path.exists():
+                try:
+                    self.forecaster_model = joblib.load(forecaster_path)
+                    print(f"DEBUG: [ML] Forecaster Model Loaded Successfully.")
+                except Exception as e:
+                    print(f"ERROR: [ML] Forecaster Model load failed: {e}")
+            else:
+                print(f"WARNING: [ML] Forecaster model file NOT found at {forecaster_path}")
+            
             if pincode_db_path.exists():
                 self.pincode_df = pd.read_csv(pincode_db_path)
                 self.pincode_df['pincode'] = self.pincode_df['pincode'].astype(str).str.strip()
@@ -55,6 +78,7 @@ class MLPricingService:
             
             p_str = str(pincode).strip()
             z_f, z_a, c_t = 3, 4, 0
+            l_ratio = 25  # Default loss ratio
 
             if self.pincode_df is not None:
                 row = self.pincode_df[self.pincode_df['pincode'] == p_str]
@@ -62,6 +86,7 @@ class MLPricingService:
                     z_f = int(row.iloc[0]['flood_score'])
                     z_a = int(row.iloc[0]['aqi_score'])
                     c_t = int(row.iloc[0]['city_tier'])
+                    l_ratio = int(row.iloc[0]['loss_ratio'])
             
             comp = (z_f + z_a) // 2
             s_map = {'morning': 2, 'evening': 6, 'full_day': 10}
@@ -81,9 +106,6 @@ class MLPricingService:
             # Baseline Actuarial P_Weekly
             loading = int(((r_score / 1500.0) * 450.0) / 0.65 + 10.0)
 
-            # Extract current pincode loss ratio (Pool Protection)
-            l_ratio = int(row.iloc[0]['loss_ratio']) if not row.empty else 25
-            
             return r_score, loading, {"zone_flood_score": z_f, "zone_aqi_score": z_a, "pincode_loss_ratio": l_ratio}
             
         except Exception as e:
@@ -124,5 +146,68 @@ class MLPricingService:
             "risk_score": int(score),
             "pincode_loss_ratio": int(loss_ratio)
         }
+
+    def evaluate_fraud_claim(self, claim_data: dict) -> dict:
+        """
+        Evaluates a claim using the IsolationForest fraud model.
+        claim_data expects keys matching the 5 signals.
+        Returns:
+            dict: {"is_fraud": bool, "status": str}
+        """
+        try:
+            self._ensure_loaded()
+            if self.fraud_model is None:
+                return {"is_fraud": False, "status": "model_missing"}
+            
+            # Extract features (use reasonable defaults if missing, simulating genuine behavior to fail open)
+            features = pd.DataFrame([{
+                'location_continuity': float(claim_data.get('location_continuity', 0.8)),
+                'accelerometer_variance': float(claim_data.get('accelerometer_variance', 5.0)),
+                'minutes_active_pre_trigger': int(claim_data.get('minutes_active_pre_trigger', 60)),
+                'cell_tower_mismatch_meters': float(claim_data.get('cell_tower_mismatch_meters', 100.0)),
+                'zone_history_deliveries': int(claim_data.get('zone_history_deliveries', 50))
+            }])
+            
+            # Predict: -1 is anomaly (fraud), 1 is normal
+            prediction = self.fraud_model.predict(features)[0]
+            is_fraud = bool(prediction == -1)
+            
+            return {
+                "is_fraud": is_fraud,
+                "status": "evaluated"
+            }
+        except Exception as e:
+            print(f"CRITICAL: [ML] evaluate_fraud_claim failure: {e}")
+            return {"is_fraud": False, "status": "error"}
+
+    def predict_7_day_liability(self, zone_data: dict) -> dict:
+        """
+        Predicts total claims and payout liability for a zone over the next 7 days.
+        zone_data expects: historical_trigger_frequency, active_enrolled_riders, rain_forecast_score, aqi_forecast_score
+        """
+        try:
+            self._ensure_loaded()
+            if self.forecaster_model is None:
+                return {"estimated_claims": 0, "estimated_liability": 0, "status": "model_missing"}
+                
+            features = pd.DataFrame([{
+                'historical_trigger_frequency': float(zone_data.get('historical_trigger_frequency', 0.1)),
+                'active_enrolled_riders': int(zone_data.get('active_enrolled_riders', 100)),
+                'rain_forecast_score': float(zone_data.get('rain_forecast_score', 0.0)),
+                'aqi_forecast_score': float(zone_data.get('aqi_forecast_score', 0.0))
+            }])
+            
+            estimated_claims = int(np.clip(np.round(self.forecaster_model.predict(features)[0]), 0, None))
+            # Average payout per claim is ~630 (Mid tier)
+            estimated_liability = estimated_claims * 630.0
+            
+            return {
+                "estimated_claims": estimated_claims,
+                "estimated_liability": estimated_liability,
+                "status": "success"
+            }
+        except Exception as e:
+            print(f"CRITICAL: [ML] predict_7_day_liability failure: {e}")
+            return {"estimated_claims": 0, "estimated_liability": 0, "status": "error"}
 
 ml_service = MLPricingService()
