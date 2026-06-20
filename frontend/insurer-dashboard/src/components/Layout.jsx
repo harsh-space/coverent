@@ -9,9 +9,9 @@ export default function Layout() {
       {/* Sidebar - Matching PWA's light, clean branding */}
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 bg-ui-white" style={{ backgroundColor: "#FAFAFA" }}>
+      <div className="flex-1 flex flex-col min-w-0 bg-transparent">
         {/* Cleaner PWA-inspired Header */}
-        <header className="h-20 bg-ui-white border-b border-ui-gray-light flex items-center justify-between px-8 shrink-0 z-20">
+        <header className="h-20 bg-ui-white/80 backdrop-blur-md border-b border-ui-gray-light flex items-center justify-between px-8 shrink-0 z-20 sticky top-0">
           <div className="flex items-center">
             <h1 className="text-3xl font-black tracking-tight text-ui-black">Insurer Dashboard</h1>
           </div>
