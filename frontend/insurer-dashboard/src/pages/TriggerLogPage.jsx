@@ -27,26 +27,26 @@ export default function TriggerLogPage() {
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
+        <div className="glass-card p-6 bg-ui-white">
            <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Triggered Logs</p>
-           <p className="text-2xl font-black text-status-red tracking-tight">{triggers.filter(t => t.status === "TRIGGERED").length}</p>
+           <p className="text-3xl font-black text-status-red tracking-tight">{triggers.filter(t => t.status === "TRIGGERED").length}</p>
         </div>
-        <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
+        <div className="glass-card p-6 bg-ui-white">
            <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Monitoring Active</p>
-           <p className="text-2xl font-black text-status-green tracking-tight">{triggers.filter(t => t.status === "MONITORING").length}</p>
+           <p className="text-3xl font-black text-status-green tracking-tight">{triggers.filter(t => t.status === "MONITORING").length}</p>
         </div>
-        <div className="bg-ui-white border border-ui-gray-light p-5 rounded-2xl shadow-sm">
+        <div className="glass-card p-6 bg-ui-white">
            <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">Impacted Personnel</p>
-           <p className="text-2xl font-black text-ui-black tracking-tight">{triggers.reduce((a, b) => a + (b.affected_riders || 0), 0)}</p>
+           <p className="text-3xl font-black text-ui-black tracking-tight">{triggers.reduce((a, b) => a + (b.affected_riders || 0), 0)}</p>
         </div>
       </div>
 
       {/* Clean Modern Table - Solid White, Minimal Shadows */}
-      <div className="bg-ui-white border border-ui-gray-light rounded-2xl shadow-sm overflow-hidden">
+      <div className="glass-card overflow-hidden bg-ui-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-ui-gray-light/30 border-b border-ui-gray-light">
+              <tr className="bg-ui-gray-light/20 border-b border-ui-gray-light">
                 <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Trigger Event</th>
                 <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Monitoring Zone</th>
                 <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest text-center">Reading</th>

@@ -161,21 +161,23 @@ export default function Onboarding() {
       {view === 'initial' && (
         <div className="flex-1 flex flex-col justify-center animate-fade-in px-4">
           <div className="text-center mb-12">
-            <ShieldCheck className="text-brand-yellow w-16 h-16 mx-auto mb-4" strokeWidth={2.5} />
-            <h1 className="text-4xl font-black tracking-tight mb-2">Coverent</h1>
-            <p className="text-sm font-bold text-ui-gray-dark">Income Protection for Delivery Partners</p>
+            <div className="w-24 h-24 bg-ui-black rounded-3xl flex items-center justify-center shadow-[0_20px_40px_rgb(0,0,0,0.15)] mx-auto mb-6 transform -rotate-6 hover:rotate-0 transition-all duration-300">
+               <ShieldCheck className="text-brand-yellow w-12 h-12" strokeWidth={2.5} />
+            </div>
+            <h1 className="text-5xl font-black tracking-tighter mb-3 text-ui-black">Coverent</h1>
+            <p className="text-sm font-bold text-ui-gray-dark uppercase tracking-widest">Income Protection for Delivery Partners</p>
           </div>
 
-          <div className="space-y-4 px-2 mt-8">
+          <div className="space-y-4 px-2 mt-12">
             <button
               onClick={() => setView('login')}
-              className="btn-primary w-full py-4 text-lg"
+              className="btn-primary w-full text-lg shadow-[0_10px_30px_rgb(0,0,0,0.15)]"
             >
               Login
             </button>
             <button
               onClick={() => setView('register')}
-              className="w-full bg-ui-white border-2 border-ui-gray-light text-ui-black rounded-xl py-4 px-6 font-black tracking-wide shadow-sm active:scale-95 transition-all text-center hover:bg-ui-gray-light/30"
+              className="w-full bg-ui-white border-2 border-ui-gray-light text-ui-black rounded-xl py-4 px-6 font-black tracking-wide shadow-sm active:scale-95 transition-all text-center hover:bg-ui-gray-light/50"
             >
               Create New Account
             </button>
@@ -188,11 +190,11 @@ export default function Onboarding() {
           <button onClick={() => setView('initial')} className="text-sm font-bold text-ui-gray-dark mb-6 tracking-wider uppercase flex items-center w-fit hover:text-ui-black transition-colors">← Back</button>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-black mb-2">Welcome Back</h2>
+            <h2 className="text-4xl font-black mb-2 tracking-tight">Welcome Back</h2>
             <p className="text-sm font-bold text-ui-gray-dark">Enter your mobile number to login.</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6 flex-1 flex flex-col bg-ui-white rounded-2xl pb-6">
+          <form onSubmit={handleLogin} className="space-y-6 flex-1 flex flex-col glass-card border-none shadow-[0_10px_40px_rgb(0,0,0,0.06)] rounded-3xl p-6">
             <div>
               <label className="text-[11px] font-black text-ui-gray-dark mb-2 block tracking-widest uppercase">Phone Number</label>
               <input
@@ -245,17 +247,17 @@ export default function Onboarding() {
           <div className="px-4">
             <button onClick={() => setView('initial')} className="text-sm font-bold text-ui-gray-dark mb-6 tracking-wider uppercase flex items-center w-fit hover:text-ui-black transition-colors">← Back</button>
             <div className="mb-6">
-              <h1 className="text-3xl font-black tracking-tight mb-1">Rider Registration</h1>
+              <h1 className="text-4xl font-black tracking-tight mb-2">Rider Registration</h1>
               <p className="text-sm font-bold text-ui-gray-dark">Get income protection for your delivery zone</p>
             </div>
           </div>
 
-          <div className="bg-brand-yellow rounded-2xl p-6 px-3 mb-8 shadow-sm mx-4 flex items-center justify-center gap-2 whitespace-nowrap">
-            <span className="text-3xl shrink-0">🛵</span>
-            <h2 className="text-xl font-black leading-tight">Earn. Protect. Deliver.</h2>
+          <div className="bg-brand-yellow text-ui-black rounded-3xl p-6 px-4 mb-8 shadow-[0_10px_30px_rgb(255,222,0,0.3)] mx-4 flex items-center justify-center gap-3 whitespace-nowrap transform -rotate-1">
+            <span className="text-4xl shrink-0">🛵</span>
+            <h2 className="text-2xl font-black tracking-tight">Earn. Protect. Deliver.</h2>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-6 flex-1 flex flex-col bg-ui-white rounded-2xl pb-6 px-4">
+          <form onSubmit={handleRegister} className="space-y-6 flex-1 flex flex-col glass-card border-none shadow-[0_10px_40px_rgb(0,0,0,0.06)] rounded-[2rem] p-6 mx-4 mb-4">
             {/* Full Name */}
             <div>
               <label className="text-[11px] font-black text-ui-gray-dark mb-2 block tracking-widest uppercase">Full Name</label>

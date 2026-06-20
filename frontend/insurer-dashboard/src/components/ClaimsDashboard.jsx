@@ -37,11 +37,11 @@ export default function ClaimsDashboard() {
       </div>
 
       {/* Modern Clean Table Wrapper */}
-      <div className="bg-ui-white border border-ui-gray-light rounded-2xl shadow-sm overflow-hidden">
+      <div className="glass-card overflow-hidden bg-ui-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-ui-gray-light/30 border-b border-ui-gray-light">
+              <tr className="bg-ui-gray-light/20 border-b border-ui-gray-light">
                 <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Protocol ID</th>
                 <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Entity</th>
                 <th className="px-6 py-4 text-[11px] font-black text-ui-gray-dark uppercase tracking-widest">Trigger</th>

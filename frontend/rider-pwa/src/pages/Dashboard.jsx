@@ -154,8 +154,15 @@ export default function Dashboard() {
     return new Date() > new Date(profile.valid_until);
   };
 
+  const getPolicyName = (type) => {
+    if (type === 'suraksha_basic') return 'Suraksha Lite';
+    if (type === 'suraksha_plus') return 'Suraksha Plus';
+    if (type === 'bima_elite') return 'Suraksha Max';
+    return type || 'No Active Policy';
+  };
+
   const activePolicy = {
-    plan: isPolicyExpired() ? 'No Active Policy' : (profile?.policy_name || 'No Active Policy'),
+    plan: isPolicyExpired() ? 'No Active Policy' : getPolicyName(profile?.policy_type),
     status: (profile?.active_policy && !isPolicyExpired()) ? 'ACTIVE' : 'INACTIVE',
     validUntil: formatValidUntil(profile?.valid_until),
     zone: profile?.dark_store_pincode ? `Zone ${profile.dark_store_pincode}` : 'Not Set',
@@ -200,20 +207,18 @@ export default function Dashboard() {
   const displayInitial = displayName.charAt(0).toUpperCase();
 
   return (
-    <div className="flex-1 flex flex-col pt-8 animate-fade-in relative min-h-[100dvh] text-ui-black bg-ui-white">
+    <div className="flex-1 flex flex-col pt-8 px-4 animate-fade-in relative min-h-[100dvh] text-ui-black bg-transparent">
       {isOffline && (
         <div className="fixed top-0 left-0 right-0 bg-status-red text-ui-white py-1 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-center z-[200] animate-pulse">
           ⚠️ Oracle Network Offline - Link Lost
         </div>
       )}
-      <div className="flex items-center justify-between mb-8 shrink-0 px-1">
+      <div className="flex items-center justify-between mb-8 shrink-0">
         <div>
-          <h1 className="text-2xl font-black tracking-tight mb-1">{displayName}</h1>
-          <div className="flex items-center gap-3">
-            {/* Minimalist status icons only if desired - removing text for now as requested */}
-          </div>
+          <h1 className="text-3xl font-black tracking-tight mb-1">{displayName}</h1>
+          <p className="text-sm font-bold text-ui-gray-dark uppercase tracking-widest">Rider Dashboard</p>
         </div>
-        <div className="w-12 h-12 bg-brand-yellow rounded-full flex items-center justify-center font-black text-xl shadow-sm border-2 border-ui-black/5">
+        <div className="w-14 h-14 bg-brand-yellow rounded-2xl flex items-center justify-center font-black text-2xl shadow-[0_8px_30px_rgb(255,222,0,0.3)] border border-brand-dark/20 text-ui-black">
           {displayInitial}
         </div>
       </div>
@@ -251,28 +256,33 @@ export default function Dashboard() {
 
         {/* Active Policy Card */}
         <section>
-          <div className="bg-brand-yellow rounded-2xl p-5 shadow-sm relative overflow-hidden">
-            <div className="flex justify-between items-start mb-4 relative z-10">
+          <div className="bg-ui-black text-ui-white rounded-3xl p-6 shadow-[0_20px_40px_rgb(0,0,0,0.15)] relative overflow-hidden transition-all hover:shadow-[0_20px_50px_rgb(0,0,0,0.25)] hover:-translate-y-1">
+            <div className="flex justify-between items-start mb-6 relative z-10">
               <div>
-                <span className="text-[10px] font-black text-ui-black/70 tracking-widest uppercase mb-1 block">Active Policy</span>
-                <h2 className="text-2xl font-black mb-1">{activePolicy.plan}</h2>
-                <p className="text-sm font-bold text-ui-black/80">Valid till {activePolicy.validUntil}</p>
+                <span className="text-[10px] font-black text-ui-white/50 tracking-widest uppercase mb-1.5 block">Active Coverage</span>
+                <h2 className="text-3xl font-black mb-1">{activePolicy.plan}</h2>
+                <p className="text-sm font-medium text-ui-white/80">Valid till {activePolicy.validUntil}</p>
               </div>
-              <div className="flex items-center gap-1 bg-ui-white border border-ui-black/10 text-status-green px-3 py-1 rounded-full text-xs font-black shadow-sm shrink-0">
+              <div className="flex items-center gap-1.5 bg-status-green/10 text-status-green px-3 py-1.5 rounded-full text-xs font-black shadow-inner shrink-0 border border-status-green/20">
                 <span className="w-2 h-2 rounded-full bg-status-green animate-pulse" />
                 {activePolicy.status}
               </div>
             </div>
 
-            <div className="bg-ui-white/90 rounded-xl p-3 flex items-center gap-3 relative z-10 border border-ui-black/5 mt-4 shadow-sm">
-              <MapPin className="w-5 h-5 text-ui-gray-dark shrink-0" strokeWidth={2.5} />
+            <div className="bg-ui-white/5 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-4 relative z-10 border border-ui-white/10 mt-6 group">
+              <div className="w-10 h-10 rounded-full bg-brand-yellow/20 flex items-center justify-center text-brand-yellow group-hover:scale-110 transition-transform">
+                 <MapPin className="w-5 h-5" strokeWidth={2.5} />
+              </div>
               <div>
-                <p className="text-xs font-bold text-ui-gray-dark mb-0.5">Monitoring Zone</p>
-                <p className="text-sm font-black leading-tight">{activePolicy.zone}</p>
+                <p className="text-[10px] font-bold text-ui-white/50 uppercase tracking-widest mb-0.5">Monitoring Zone</p>
+                <p className="text-lg font-black leading-tight text-ui-white">{activePolicy.zone}</p>
               </div>
             </div>
 
-            <ShieldCheck className="absolute -bottom-4 -right-4 w-32 h-32 text-brand-dark opacity-30 pointer-events-none" />
+            {/* Premium decorative shapes instead of simple icon */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <ShieldCheck className="absolute -bottom-6 -right-6 w-36 h-36 text-ui-white opacity-[0.03] pointer-events-none" />
           </div>
 
           {profile && !profile.is_eligible_for_policy && (
@@ -288,18 +298,18 @@ export default function Dashboard() {
           )}
 
           {profile && !profile.active_policy && (
-            <div className="bg-ui-white border-2 border-brand-yellow p-4 rounded-xl mt-3 shadow-sm text-center relative overflow-hidden">
+            <div className="glass-card border-2 border-brand-yellow/30 p-5 rounded-3xl mt-4 text-center relative overflow-hidden">
               <div className="relative z-10">
-                <h3 className="font-black text-lg mb-1 flex justify-center items-center gap-1.5">
-                  <ShieldAlert className="w-5 h-5 text-status-orange" strokeWidth={2.5} />
+                <h3 className="font-black text-xl mb-2 flex justify-center items-center gap-2">
+                  <ShieldAlert className="w-6 h-6 text-status-orange" strokeWidth={2.5} />
                   You're Unprotected
                 </h3>
-                <p className="text-xs font-bold text-ui-gray-dark mb-4 px-2">
+                <p className="text-sm font-medium text-ui-gray-dark mb-5 px-2">
                   Set up your customizable gig insurance policy now to lock in your tailored premium based on your zone profile.
                 </p>
                 <button
                   onClick={() => navigate('/risk-profile')}
-                  className="btn-primary w-full text-sm py-3 flex justify-center items-center gap-2"
+                  className="btn-accent w-full text-sm py-4 flex justify-center items-center gap-2"
                 >
                   Set Up Insurance Now <Zap className="w-4 h-4" fill="currentColor" />
                 </button>
@@ -309,69 +319,74 @@ export default function Dashboard() {
         </section>
 
         {/* Live System Status */}
-        <section>
-          <h3 className="text-lg font-black mb-3 flex items-center gap-2 uppercase tracking-tight">
-            <Zap className="w-5 h-5 text-brand-yellow" strokeWidth={2.5} fill="currentColor" /> System Diagnostics
+        <section className="mt-8">
+          <h3 className="text-sm font-black mb-4 text-ui-gray-dark uppercase tracking-widest flex items-center gap-2">
+            <Gauge className="w-4 h-4" strokeWidth={3} /> System Diagnostics
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {/* Card 1: Weather */}
-            <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4 shadow-sm hover:border-brand-yellow transition-colors">
-              <div className="flex justify-between items-start mb-2">
-                <CloudRain className="w-6 h-6 text-blue-500" strokeWidth={2.5} />
-                <div className="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse" />
+            <div className="glass-card p-4 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgb(0,0,0,0.08)]">
+              <div className="flex justify-between items-start mb-3">
+                <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
+                  <CloudRain className="w-5 h-5" strokeWidth={2.5} />
+                </div>
+                <div className="w-2 h-2 rounded-full bg-status-green animate-pulse" />
               </div>
-              <p className="text-[10px] font-black text-ui-gray-dark uppercase tracking-wider mb-0.5">Env Node</p>
-              <p className="text-sm font-black flex items-center gap-1">
+              <p className="text-[10px] font-bold text-ui-gray-dark uppercase tracking-widest mb-1">Env Node</p>
+              <p className="text-base font-black flex items-center gap-1">
                 Clear Sky
               </p>
             </div>
 
             {/* Card 2: Platform */}
-            <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4 shadow-sm hover:border-brand-yellow transition-colors">
-              <div className="flex justify-between items-start mb-2">
-                <Globe className="w-6 h-6 text-brand-dark" strokeWidth={2.5} />
-                <div className="w-1.5 h-1.5 rounded-full bg-status-green animate-pulse" />
+            <div className="glass-card p-4 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgb(0,0,0,0.08)]">
+              <div className="flex justify-between items-start mb-3">
+                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                  <Globe className="w-5 h-5" strokeWidth={2.5} />
+                </div>
+                <div className="w-2 h-2 rounded-full bg-status-green animate-pulse" />
               </div>
-              <p className="text-[10px] font-black text-ui-gray-dark uppercase tracking-wider mb-0.5">Platform API</p>
-              <p className="text-sm font-black flex items-center gap-1 leading-tight">
+              <p className="text-[10px] font-bold text-ui-gray-dark uppercase tracking-widest mb-1">Platform API</p>
+              <p className="text-base font-black flex items-center gap-1 leading-tight">
                 {profile?.platform?.replace('swiggy_', '').replace('_', ' ').toUpperCase() || 'SYNCING'}
               </p>
             </div>
 
             {/* Card 3: Zone Risk Score */}
-            <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4 shadow-sm hover:border-brand-yellow transition-colors group">
-              <div className="flex justify-between items-start mb-2">
-                <Gauge className={`w-6 h-6 ${(profile?.risk_score || 0) < 40 ? 'text-status-green' : (profile?.risk_score || 0) < 80 ? 'text-status-orange' : 'text-status-red'}`} strokeWidth={2.5} />
-                <div className={`w-1.5 h-1.5 rounded-full ${(profile?.risk_score || 0) < 80 ? 'bg-status-green' : 'bg-status-orange'} animate-pulse`} />
+            <div className="glass-card p-4 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgb(0,0,0,0.08)] group">
+              <div className="flex justify-between items-start mb-3">
+                <div className={`p-2 rounded-lg ${(profile?.risk_score || 0) < 40 ? 'bg-status-green/10 text-status-green' : (profile?.risk_score || 0) < 80 ? 'bg-status-orange/10 text-status-orange' : 'bg-status-red/10 text-status-red'}`}>
+                  <Activity className="w-5 h-5" strokeWidth={2.5} />
+                </div>
+                <div className={`w-2 h-2 rounded-full ${(profile?.risk_score || 0) < 80 ? 'bg-status-green' : 'bg-status-orange'} animate-pulse`} />
               </div>
-              <p className="text-[10px] font-black text-ui-gray-dark uppercase tracking-wider mb-0.5">Risk Rating</p>
-              <p className={`text-sm font-black flex items-center gap-1 group-hover:scale-105 transition-transform`}>
-                {profile?.risk_score || 74}/100
-                <span className={`text-[9px] px-1.5 py-0.5 rounded-full ml-1 ${(profile?.risk_score || 0) < 40 ? 'bg-status-green/10 text-status-green' : (profile?.risk_score || 0) < 80 ? 'bg-status-orange/10 text-status-orange' : 'bg-status-red/10 text-status-red'}`}>
-                  {(profile?.risk_score || 0) < 40 ? 'LOW' : (profile?.risk_score || 0) < 80 ? 'MODERATE' : 'HIGH'}
-                </span>
-              </p>
+              <p className="text-[10px] font-bold text-ui-gray-dark uppercase tracking-widest mb-1">Risk Rating</p>
+              <div className={`text-base font-black flex items-center gap-2 group-hover:scale-105 transition-transform`}>
+                {profile?.risk_score || 74}<span className="text-xs font-medium text-ui-gray-dark">/100</span>
+              </div>
             </div>
 
             {/* Card 4: Regional Risk */}
-            <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4 shadow-sm hover:border-brand-yellow transition-colors">
-              <div className="flex justify-between items-start mb-2">
-                <Shield className={`w-6 h-6 ${profile?.active_policy ? 'text-status-green' : 'text-ui-gray-dark'}`} strokeWidth={2.5} />
-                <div className={`w-1.5 h-1.5 rounded-full ${profile?.active_policy ? 'bg-status-green' : 'bg-status-orange'} animate-pulse`} />
+            <div className="glass-card p-4 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgb(0,0,0,0.08)]">
+              <div className="flex justify-between items-start mb-3">
+                <div className={`p-2 rounded-lg ${profile?.active_policy ? 'bg-brand-yellow/20 text-brand-dark' : 'bg-ui-gray-light text-ui-gray-dark'}`}>
+                  <Shield className="w-5 h-5" strokeWidth={2.5} />
+                </div>
+                <div className={`w-2 h-2 rounded-full ${profile?.active_policy ? 'bg-status-green' : 'bg-status-orange'} animate-pulse`} />
               </div>
-              <p className="text-[10px] font-black text-ui-gray-dark uppercase tracking-wider mb-0.5">Zone Risk</p>
-              <p className="text-sm font-black flex items-center gap-1">
-                {profile?.active_policy ? 'Covered' : 'Low'}
+              <p className="text-[10px] font-bold text-ui-gray-dark uppercase tracking-widest mb-1">Zone Status</p>
+              <p className="text-base font-black flex items-center gap-1">
+                {profile?.active_policy ? 'Protected' : 'Low'}
               </p>
             </div>
           </div>
         </section>
 
         {/* Claim History */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-black flex items-center gap-2">
-              <Clock className="w-5 h-5 text-ui-gray-dark" strokeWidth={2.5} /> Recent Activity
+        <section className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-black text-ui-gray-dark uppercase tracking-widest flex items-center gap-2">
+              <Clock className="w-4 h-4" strokeWidth={3} /> Recent Payouts
             </h3>
             <button
               onClick={async () => {
@@ -381,13 +396,8 @@ export default function Dashboard() {
                   const res = await fetch(`${CONFIG.API_BASE_URL}/riders/profile/${rider_id}`);
                   if (res.ok) {
                     const data = await res.json();
-                    const history = data.payout_history || [];
-                    if (payoutCountRef.current !== -1 && history.length > payoutCountRef.current) {
-                       setNewClaimNotify(history[0]);
-                    }
                     setProfile(data);
-                    payoutCountRef.current = history.length;
-                    addToast('Claims Synced', 'success');
+                    addToast('Synced successfully', 'success');
                   }
                 } catch (err) {
                   addToast('Manual sync failed', 'error');
@@ -395,11 +405,10 @@ export default function Dashboard() {
                   setLoading(false);
                 }
               }}
-              className="group p-2 hover:bg-ui-gray-light/50 rounded-full transition-all flex items-center gap-1.5"
+              className="p-2 hover:bg-ui-gray-light/50 rounded-full transition-all"
               title="Sync Claims"
             >
-              <RotateCw className="w-4 h-4 text-ui-gray-dark group-active:rotate-180 transition-transform duration-500" strokeWidth={3} />
-              <span className="text-[10px] font-black uppercase tracking-tighter text-ui-gray-dark">Sync</span>
+              <RotateCw className="w-4 h-4 text-ui-gray-dark hover:rotate-180 transition-transform duration-500" strokeWidth={3} />
             </button>
           </div>
 
@@ -409,18 +418,18 @@ export default function Dashboard() {
                 <div
                   key={claim.payout_id}
                   onClick={() => setExpandedClaim(expandedClaim === claim.payout_id ? null : claim.payout_id)}
-                  className={`bg-ui-white border ${expandedClaim === claim.payout_id ? 'border-brand-yellow ring-1 ring-brand-yellow/30' : 'border-ui-gray-light'} rounded-xl p-0 flex flex-col shadow-sm transition-all duration-300 overflow-hidden cursor-pointer active:scale-[0.98]`}
+                  className={`glass-card p-0 flex flex-col overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-[0_10px_40px_rgb(0,0,0,0.08)] ${expandedClaim === claim.payout_id ? 'ring-2 ring-ui-black/10' : ''}`}
                 >
-                  <div className="p-4 flex gap-4 items-start">
-                    <div className={`w-10 h-10 rounded-full ${expandedClaim === claim.payout_id ? 'bg-brand-yellow text-ui-black' : 'bg-status-green/10 text-status-green'} flex items-center justify-center shrink-0 transition-colors duration-300`}>
-                      <CheckCircle2 className="w-5 h-5" strokeWidth={2.5} />
+                  <div className="p-4 flex gap-4 items-center">
+                    <div className={`w-12 h-12 rounded-xl ${expandedClaim === claim.payout_id ? 'bg-ui-black text-ui-white' : 'bg-status-green/10 text-status-green'} flex items-center justify-center shrink-0 transition-colors duration-300`}>
+                      <CheckCircle2 className="w-6 h-6" strokeWidth={2.5} />
                     </div>
                     <div className="flex-1">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-black text-sm leading-snug pr-2 uppercase tracking-tight">{claim.trigger_type.replace('_', ' ')}</h4>
-                        <span className="font-black text-status-green shrink-0">+₹{claim.amount}</span>
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="font-black text-sm uppercase tracking-tight">{claim.trigger_type.replace('_', ' ')}</h4>
+                        <span className="font-black text-status-green text-lg shrink-0">+₹{claim.amount}</span>
                       </div>
-                      <p className="text-[11px] font-bold text-ui-gray-dark italic">
+                      <p className="text-[11px] font-medium text-ui-gray-dark">
                         Instant Settlement via UPI
                       </p>
                     </div>
@@ -428,46 +437,19 @@ export default function Dashboard() {
 
                   {/* Expandable Tray */}
                   <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedClaim === claim.payout_id ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="px-4 pb-4 bg-ui-gray-light/10 border-t border-dashed border-ui-gray-light">
-                      <div className="py-4 space-y-4">
-                        {/* Status Timeline */}
-                        <div className="flex items-center justify-between px-2">
-                          <div className="flex flex-col items-center gap-1 group">
-                            <div className="w-7 h-7 rounded-lg bg-ui-black text-brand-yellow flex items-center justify-center shadow-sm">
-                              <CloudRain className="w-4 h-4" />
-                            </div>
-                            <span className="text-[8px] font-black uppercase text-ui-gray-dark">Trigger</span>
-                          </div>
-                          <div className="h-[2px] flex-1 bg-ui-black/5 mx-2" />
-                          <div className="flex flex-col items-center gap-1">
-                            <div className="w-7 h-7 rounded-lg bg-ui-black text-brand-yellow flex items-center justify-center shadow-sm">
-                              <ShieldCheck className="w-4 h-4" />
-                            </div>
-                            <span className="text-[8px] font-black uppercase text-ui-gray-dark">Verified</span>
-                          </div>
-                          <div className="h-[2px] flex-1 bg-ui-black/5 mx-2" />
-                          <div className="flex flex-col items-center gap-1">
-                            <div className="w-7 h-7 rounded-lg bg-status-green text-ui-white flex items-center justify-center shadow-md">
-                              <CheckCircle2 className="w-4 h-4" />
-                            </div>
-                            <span className="text-[8px] font-black uppercase text-status-green">Credited</span>
-                          </div>
+                    <div className="px-4 pb-4 bg-ui-white/50 border-t border-ui-black/5">
+                      <div className="pt-4 pb-2 space-y-3">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-ui-gray-dark font-medium">Reference ID</span>
+                          <span className="font-mono font-bold text-ui-black">TXN-{claim.payout_id.split('-')[0].toUpperCase()}</span>
                         </div>
-
-                        {/* Metadata Details */}
-                        <div className="bg-ui-white/50 rounded-lg p-3 space-y-2 border border-ui-black/5">
-                          <div className="flex justify-between items-center text-[10px] font-bold">
-                            <span className="text-ui-gray-dark uppercase tracking-wider">Reference ID</span>
-                            <span className="font-mono text-ui-black">TXN-{claim.payout_id.split('-')[0].toUpperCase()}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[10px] font-bold">
-                            <span className="text-ui-gray-dark uppercase tracking-wider">Settled On</span>
-                            <span className="text-ui-black">{new Date(claim.timestamp).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[10px] font-bold">
-                            <span className="text-ui-gray-dark uppercase tracking-wider">Severity Log</span>
-                            <span className="text-ui-black">{claim.tier_percentage}% Payout Triggered</span>
-                          </div>
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-ui-gray-dark font-medium">Settled On</span>
+                          <span className="font-bold text-ui-black">{new Date(claim.timestamp).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-ui-gray-dark font-medium">Severity Log</span>
+                          <span className="font-bold text-ui-black">{claim.tier_percentage}% Payout Triggered</span>
                         </div>
                       </div>
                     </div>
@@ -475,8 +457,8 @@ export default function Dashboard() {
                 </div>
               ))
             ) : (
-              <div className="bg-ui-gray-light/30 border border-ui-gray-light rounded-xl p-8 text-center">
-                <p className="text-sm font-bold text-ui-gray-dark opacity-60">No recent claims detected in your zone.</p>
+              <div className="glass-card p-8 text-center border-dashed">
+                <p className="text-sm font-medium text-ui-gray-dark opacity-60">No recent claims detected in your zone.</p>
               </div>
             )}
           </div>

@@ -80,10 +80,12 @@ export default function RiskProfile() {
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col pt-8 animate-fade-in relative text-ui-black">
+    <div className="flex-1 flex flex-col pt-8 animate-fade-in relative text-ui-black px-4">
       <div className="flex items-center gap-2 mb-8">
-        <ShieldCheck className="text-brand-yellow w-8 h-8" strokeWidth={2.5} />
-        <h1 className="text-2xl font-black tracking-tight">Coverent</h1>
+        <div className="w-12 h-12 bg-ui-black rounded-xl flex items-center justify-center shadow-[0_10px_20px_rgb(0,0,0,0.15)] transform -rotate-3">
+          <ShieldCheck className="text-brand-yellow w-6 h-6" strokeWidth={2.5} />
+        </div>
+        <h1 className="text-3xl font-black tracking-tight">Coverent</h1>
       </div>
 
       {analyzing ? (
@@ -120,11 +122,11 @@ export default function RiskProfile() {
         </div>
       ) : (
         <div className="flex-1 flex flex-col animate-slide-in">
-          <div className="bg-ui-white border-2 border-ui-gray-light rounded-2xl p-6 mb-6 shadow-sm relative overflow-hidden">
-            <h2 className="text-xs font-black text-ui-gray-dark uppercase tracking-wider mb-2">Zone Composite Score</h2>
-            <div className="flex items-end gap-2 mb-6">
-              <span className="text-6xl font-black">{riskScore}</span>
-              <span className="text-xl font-bold text-ui-gray-dark mb-1">/100</span>
+          <div className="glass-card border-none shadow-[0_10px_40px_rgb(0,0,0,0.06)] p-8 mb-6 relative overflow-hidden">
+            <h2 className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-2">Zone Composite Score</h2>
+            <div className="flex items-end gap-2 mb-8">
+              <span className="text-7xl font-black tracking-tighter">{riskScore}</span>
+              <span className="text-2xl font-bold text-ui-gray-dark mb-2">/100</span>
             </div>
           ...
 
@@ -165,10 +167,12 @@ export default function RiskProfile() {
             </div>
           </div>
 
-          <div className="bg-status-green/10 border-2 border-status-green/30 rounded-xl p-4 mb-auto flex gap-3 shadow-sm">
-            <CheckCircle className="w-6 h-6 text-status-green shrink-0 mt-0.5" strokeWidth={2.5} />
+          <div className="glass-card bg-ui-white/40 border border-status-green/20 p-5 mb-auto flex gap-4">
+            <div className="w-10 h-10 bg-status-green/10 rounded-full flex items-center justify-center shrink-0">
+               <CheckCircle className="w-5 h-5 text-status-green" strokeWidth={2.5} />
+            </div>
             <div>
-              <h3 className="font-black text-status-green mb-1">AI Recommendation</h3>
+              <h3 className="font-black text-ui-black mb-1">AI Recommendation</h3>
               <p className="text-sm text-ui-gray-dark leading-relaxed font-bold">Based on your zone profile, we strongly recommend the <strong>{riskScore > 60 ? 'Suraksha Max' : riskScore > 40 ? 'Suraksha Plus' : 'Suraksha Lite'}</strong> plan to cover ~{riskScore > 60 ? '3' : riskScore > 40 ? '2' : '1'} disruption days per week.</p>
             </div>
           </div>

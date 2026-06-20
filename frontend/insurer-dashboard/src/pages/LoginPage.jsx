@@ -17,24 +17,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center font-sans text-ui-black bg-brand-light animate-fade-in">
+    <div className="fixed inset-0 flex items-center justify-center font-sans text-ui-black bg-transparent animate-fade-in">
       
-      {/* Background Blobs (Kept as simple clean solid shapes to avoid 'glassmorphism' blurry look) */}
-      <div className="absolute w-[600px] h-[600px] rounded-full top-[-150px] right-[-100px] opacity-20 bg-brand-yellow pointer-events-none animate-pulse" />
-      <div className="absolute w-[500px] h-[500px] rounded-full bottom-[-200px] left-[-100px] opacity-10 bg-brand-dark pointer-events-none animate-pulse delay-700" />
-
       {/* Main Login UI - Proper Web Page Card Layout */}
-      <div className="relative z-10 w-full max-w-[440px] px-8 py-10 bg-ui-white rounded-[2.5rem] shadow-xl border border-ui-gray-light/50 flex flex-col items-center">
+      <div className="relative z-10 w-full max-w-[440px] px-8 py-10 glass-card bg-ui-white/90 border border-ui-black/10 flex flex-col items-center">
         
         {/* Logo Section - Consistent with Rider PWA Design */}
-        <div className="text-center mb-10 w-full">
-          <div className="text-brand-yellow w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-             <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-             </svg>
+        <div className="text-center mb-10 w-full flex flex-col items-center">
+          <div className="w-20 h-20 bg-ui-black rounded-2xl flex items-center justify-center shadow-[0_10px_20px_rgb(0,0,0,0.15)] transform -rotate-3 mb-6">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-brand-yellow">
+              <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
           </div>
-          <h1 className="text-4xl font-black tracking-tight mb-1 text-ui-black">Coverent</h1>
+          <h1 className="text-5xl font-black tracking-tight text-ui-black mb-2">Coverent</h1>
           <p className="text-sm font-bold text-ui-gray-dark">Insurer Gateway Authentication</p>
         </div>
 
@@ -67,9 +63,11 @@ export default function LoginPage() {
           <button 
             type="submit"
             disabled={isLoading || !username || !password}
-            className={`btn-primary w-full mt-4 ${(!username || !password) ? 'opacity-50 grayscale cursor-not-allowed shadow-none' : ''}`}
+            className={`btn-primary w-full mt-4 flex items-center justify-center gap-2 ${(!username || !password) ? 'opacity-50 grayscale cursor-not-allowed shadow-none border-ui-gray-light' : ''}`}
           >
-            {isLoading ? "Verifying..." : "Authorize Access →"}
+            {isLoading ? (
+               <><div className="w-5 h-5 border-2 border-ui-white border-t-transparent rounded-full animate-spin"></div> Verifying...</>
+            ) : "Authorize Access →"}
           </button>
         </form>
 

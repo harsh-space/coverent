@@ -23,7 +23,7 @@ const TRIGGER_COLORS = {
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4 shadow-xl">
+    <div className="bg-ui-white border-2 border-ui-gray-light rounded-xl p-4">
       <p className="text-[11px] font-black text-ui-gray-dark uppercase tracking-widest mb-1.5">{label}</p>
       <div className="flex items-center gap-2">
         <span className="w-2.5 h-2.5 rounded-full" style={{ background: payload[0].fill || payload[0].color }} />
@@ -43,7 +43,7 @@ export default function ChartSummary() {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 text-ui-black font-sans">
       {/* ── Claims by Trigger — Bar Chart ── */}
-      <div className="bg-ui-white border border-ui-gray-light rounded-2xl p-8 shadow-sm hover:-translate-y-1 transition-transform">
+      <div className="glass-card p-8 bg-ui-white/80 overflow-hidden flex flex-col shadow-none hover:shadow-none">
         <div className="flex flex-col mb-8">
             <h3 className="text-2xl font-black text-ui-black tracking-tight mb-2">Impact Distribution</h3>
             <p className="text-sm font-bold text-ui-gray-dark">Aggregate Volume By Parametric Trigger</p>
@@ -72,7 +72,7 @@ export default function ChartSummary() {
       </div>
 
       {/* ── Daily Claims Trend — Area Chart ── */}
-      <div className="bg-ui-white border border-ui-gray-light rounded-2xl p-8 shadow-sm hover:-translate-y-1 transition-transform">
+      <div className="glass-card p-8 bg-ui-white/80 overflow-hidden flex flex-col shadow-none hover:shadow-none">
         <div className="flex flex-col mb-8">
             <h3 className="text-2xl font-black text-ui-black tracking-tight mb-2">Time Sequence Tracker</h3>
             <p className="text-sm font-bold text-ui-gray-dark">30-Day Aggregation of Triggered Payouts</p>
@@ -83,8 +83,8 @@ export default function ChartSummary() {
             <AreaChart data={dailyClaimsTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#F7C600" stopOpacity={0.6} />
-                  <stop offset="100%" stopColor="#F7C600" stopOpacity={0.01} />
+                  <stop offset="0%" stopColor="#FFDE00" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#FFDE00" stopOpacity={0.01} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
@@ -100,11 +100,11 @@ export default function ChartSummary() {
               <Area 
                 type="monotone" 
                 dataKey="claims" 
-                stroke="#F7C600" 
+                stroke="#FFDE00" 
                 strokeWidth={4} 
-                fill="url(#areaGradient)" 
+                fill="transparent" 
                 dot={false}
-                activeDot={{ r: 6, fill: "#F7C600", stroke: "#FFFFFF", strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: "#FFDE00", stroke: "#FFFFFF", strokeWidth: 2 }}
               />
             </AreaChart>
           </ResponsiveContainer>
