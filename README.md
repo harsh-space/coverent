@@ -109,13 +109,13 @@ Amount calculated → sent to UPI → push notification to rider. Target: within
 
 ### Insurer Web Dashboard
 
-| View | What It Shows | Status |
-|---|---|---|
-| Live Trigger Map | Active events (Rain/Heat/AQI) with zone overlays. | **Implemented** |
-| Claims/Payouts Queue | Audit log of all auto-approved payouts with fraud details. | **Implemented** |
-| Analytics Dashboard | Loss ratio, zone-wise claims, and fund disbursement. | **Implemented** |
-| Mock Trigger Dispatch | Manual simulation for demo triggers and stress tests. | **Implemented** |
-| Policy Management | Active policies, tier distribution, and pool limits. | **Implemented** |
+| View | What It Shows |
+|---|---|
+| Live Trigger Map | Active events (Rain/Heat/AQI) with zone overlays. |
+| Claims/Payouts Queue | Audit log of all auto-approved payouts with fraud details. |
+| Analytics Dashboard | Loss ratio, zone-wise claims, and fund disbursement. |
+| Mock Trigger Dispatch | Manual simulation for demo triggers and stress tests. |
+| Policy Management | Active policies, tier distribution, and pool limits. |
 
 ---
 
@@ -493,57 +493,6 @@ Follow this 5-minute walkthrough to experience the full **Coverent** parametric 
 - Switch back to the **Insurer Dashboard**.
 - Go to the **"Claims Audit"** tab to see the rider's fraud-verified claim log.
 - Go to **"Analytics"** to see the Pincode's Loss Ratio and the total disbursed funds update on the live charts.
-
----
-
-## Development Plan
-
-### Phase 1 — Ideation & Foundation (Mar 4–20)
-Goal: No code. Strategy locked, README written, repo live.
-
-- Finalise persona, triggers, and premium model
-- Design application workflow
-
----
-
-### Phase 2 — Automation & Protection (Mar 21–Apr 4)
-Goal: Working prototype — onboarding, policy, premium, claims.
-
-**Week 3 — Backend + Data Layer**
-
-- FastAPI setup + Firebase Firestore (5 collections) + Auth
-- Rider registration and onboarding API endpoints
-- Synthetic training data generation (IMD/CPCB-based)
-- XGBoost risk model — train, save as .pkl, expose via API
-- Policy creation and premium calculation endpoint
-
-**Week 4 — Frontend + Trigger Engine**
-
-- React PWA — onboarding and policy purchase screens
-- Parametric trigger engine (OpenWeatherMap + AQICN polling)
-- Mock APIs for platform outage and zone closure
-- Isolation Forest fraud model — train and integrate
-- Razorpay sandbox payout integration
-
----
-
-### Phase 3 — Scale & Optimise (Apr 5–17)
-Goal: Both dashboards complete, end-to-end connected, demo-ready.
-
-**Week 5 — Insurer Dashboard + Advanced Fraud**
-
-- Insurer dashboard — trigger map, claims queue, and analytics
-- GPS velocity anomaly check added to fraud engine
-- LSTM forecaster — train and connect to insurer dashboard
-- Rider dashboard — active policy and earnings protected view
-
-**Week 6 — Integration + Final Polish**
-
-- End-to-end flow test (trigger → fraud → payout)
-- Simulated disruption demo (fake rainstorm trigger)
-- Push notifications via Firebase Cloud Messaging
-- Bug fixes and UI polish across both interfaces
-- 5-min final demo video + pitch deck PDF
 
 ---
 
